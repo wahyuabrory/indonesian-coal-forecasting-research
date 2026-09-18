@@ -166,3 +166,61 @@ def select_by_folds(aggregated: pd.DataFrame, metric: str = "mean_rmse") -> dict
         [metric, "model", "candidate"]
     ).reset_index(drop=True)
     return dict(ordered.iloc[0])
+
+
+def select_per_family(rows: list[dict], metric: str = "rmse") -> dict[str, dict]:
+    """Best candidate inside each model family by mean fold metric.
+
+    Families compete only within themselves here. Cross-family comparison
+    happens later on the frozen final test, never on folds across families.
+    """
+    frame = pd.DataFrame(rows)
+    if frame.empty:
+        raise ValueError("No fold metrics available for selection.")
+    grouped = (
+        frame.groupby(["model", "candidate"], as_index=False)
+        .agg(mean_metric=(metric, "mean"), folds=("fold", "nunique"))
+        .sort_values(["mean_metric", "model", "candidate"])
+    )
+    winners: dict[str, dict] = {}
+    for model in grouped["model"].unique():
+        sub = grouped[grouped["model"] == model].sort_values(
+            ["mean_metric", "candidate"]
+        )
+        winners[str(model)] = dict(sub.iloc[0])
+    return winners
+
+
+def ablation_delta(frame: pd.DataFrame, value: str) -> pd.DataFrame:
+    """Delta of `value` against E0 inside the same (target, model) pair.
+
+    Expects columns target, model, feature_group, and `value`. Naive rows
+    carry no features, so callers should exclude them.
+    """
+    required = {"target", "model", "feature_group", value}
+    missing = required.difference(frame.columns)
+    if missing:
+        raise ValueError(f"Ablation frame is missing columns: {sorted(missing)}.")
+    base = frame[frame["feature_group"] == "E0"][["target", "model", value]]
+    if base.empty:
+        raise ValueError("Ablation needs E0 rows as the baseline.")
+    merged = frame.merge(
+        base.rename(columns={value: "baseline_value"}),
+        on=["target", "model"],
+        how="left",
+    )
+    merged["delta_vs_E0"] = merged[value] - merged["baseline_value"]
+    return merged.sort_values(["target", "model", "feature_group"]).reset_index(drop=True)
+
+
+def median_best_epoch(epochs: list[int]) -> int:
+    """Final-epoch count from development folds only (median best epoch)."""
+    if not epochs:
+        raise ValueError("Need at least one fold best epoch.")
+    if any(not isinstance(epoch, int) or epoch < 1 for epoch in epochs):
+        raise ValueError("Fold best epochs must be positive integers.")
+    ordered = sorted(epochs)
+    middle = len(ordered) // 2
+    if len(ordered) % 2:
+        return ordered[middle]
+    return (ordered[middle - 1] + ordered[middle]) // 2

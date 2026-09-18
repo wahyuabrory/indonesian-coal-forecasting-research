@@ -17,22 +17,24 @@ recorded in `results/data_manifest.json`.
 
 Daily adjusted-close log returns:
 
-| Target | Mean | Std | Min | Max |
-| --- | ---: | ---: | ---: | ---: |
-| ADRO | 0.00122 | 0.0286 | −0.2829 | 0.1772 |
-| PTBA | 0.00094 | 0.0253 | −0.1893 | 0.1924 |
-| ITMG | 0.00114 | 0.0250 | −0.1052 | 0.1815 |
+| Target | Mean | Std | Min | Max | Skew | Excess kurtosis |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| ADRO | 0.00122 | 0.0286 | -0.2829 | 0.1772 | -0.11 | 7.45 |
+| PTBA | 0.00094 | 0.0253 | -0.1893 | 0.1924 | 0.21 | 7.80 |
+| ITMG | 0.00114 | 0.0250 | -0.1052 | 0.1815 | 0.63 | 3.69 |
 
-Returns are centered near zero with heavy tails (daily moves above 10% and
-an ADRO −28% event). Volatility clusters over time; rolling 5/20-day
+Returns sit near zero with heavy tails. Excess kurtosis runs 3.7 to 7.8
+and a Jarque-Bera test rejects normality for all three, so the
+heavy-tails label is earned, not assumed. Daily moves top 10% and ADRO
+printed a -28% day. Volatility clusters over time; rolling 5/20-day
 volatility features capture this. Near-zero means are why the zero-return
 naive benchmark is competitive.
 
 ## External-variable behavior
 
-USD/IDR daily log changes: mean near 0.00009, std near 0.0065. That is an
-order of magnitude calmer than equity returns, whose std runs 0.025 to
-0.029. Coverage runs the full study period with no missing dates after
+USD/IDR daily log changes: mean near 0.00009, std near 0.0065. Equity
+return volatility runs about 4x higher (ratios 3.9 to 4.4 across the three
+targets). Coverage runs the full study period with no missing dates after
 alignment.
 
 ## Relationships

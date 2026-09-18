@@ -85,11 +85,20 @@ Final test (untouched): [2023-01-01, 2026-05-01)
 Fold dates can be overridden with `[[expanding_folds]]` in the config, but
 every fold must satisfy `train_end <= validation_end <= final-test origin`.
 Each fold refits preprocessing on its own training data, trains, and scores
-validation. Fold metrics are aggregated by mean RMSE per (model, candidate);
-the aggregated winner drives feature, model, and hyperparameter decisions.
-Only then is the frozen final test evaluated once. Fold-level results live
-in `results/fold_metrics.csv`; the ablation summary in
-`results/feature_ablation.csv`.
+validation. Raw candidate results live in `results/fold_metrics.csv`.
+
+Selection freezes one candidate per family using mean fold RMSE inside that
+family: one XGBoost, one GRU, one Transformer, plus the Naive benchmark.
+Families never compete on folds. The frozen models are refit on all
+pre-2023 development data, then scored once on the untouched final test, so
+`results/final_test_metrics.csv` holds all four families for every target
+and feature group.
+
+XGBoost refits directly on the full development rows. GRU and Transformer
+retrain for the median of their fold best epochs, since no held-out set
+remains inside dev for early stopping and the test must stay untouched.
+The epoch counts come from folds only. Per-family winners are recorded in
+`results/validation_winners.csv`.
 
 ## Secondary historical VaR
 

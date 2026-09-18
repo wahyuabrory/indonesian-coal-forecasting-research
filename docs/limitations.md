@@ -34,10 +34,11 @@ Test metrics remain frozen after validation selection. That protects the reporte
 
 ## Model and result interpretation
 
-External features never beat the naive benchmark by a meaningful margin in
-any of the twelve comparisons. The best delta anywhere is ADRO E1 at
--0.000008. XGBoost loses everywhere. Transformer validation gains die on
-test. Nothing here holds up across companies or feature groups.
+No feature group shows consistent out-of-sample evidence against the naive
+benchmark in any of the twelve comparisons. The largest improvement
+anywhere was very small and did not generalize. XGBoost shows no
+consistent out-of-sample evidence. Transformer validation improvements did
+not persist consistently on the final test.
 
 The naive model predicts zero next-day log return. Its low RMSE does not mean that returns are predictable. Directional accuracy and RMSE answer different questions, and neither measures economic value after costs.
 

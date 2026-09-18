@@ -4,11 +4,12 @@ Short-horizon return forecasting for Indonesian coal equities: do
 literature-supported external market variables improve next-day return
 forecasts over stock history alone, and does more model complexity pay?
 
-The short answer is no. Across ADRO, PTBA, and ITMG, external variables
-and model complexity did not consistently beat the zero-return naive
-benchmark. Small GRU gains show up in isolated folds and groups but vanish
-across equities. Details in [`docs/results.md`](docs/results.md).
-Machine-readable evidence in [`results/`](results/).
+Across ADRO, PTBA, and ITMG there is no consistent out-of-sample evidence
+that external variables or fancier models beat the zero-return naive
+benchmark. Small GRU improvements show up in isolated folds and groups but
+do not generalize across equities. Details in
+[`docs/results.md`](docs/results.md). Machine-readable evidence in
+[`results/`](results/).
 
 ## Research question
 
@@ -70,8 +71,9 @@ result traces to its exact dataset.
 `notebooks/01_data_audit.ipynb` (coverage, validity) and
 `notebooks/02_eda.ipynb` (returns, volatility, lagged relationships,
 ADRO/AADI event window). Key facts: returns are near-zero-mean and
-heavy-tailed; USD/IDR moves are an order of magnitude calmer than equity
-returns; ADRO shows a late-2024 regime shift carried as a limitation.
+heavy-tailed (excess kurtosis 3.7 to 7.8); USD/IDR moves at about a quarter
+of equity volatility; ADRO shows a late-2024 regime shift carried as a
+limitation.
 
 ## Features
 
@@ -119,13 +121,16 @@ Per-question results in [`docs/results.md`](docs/results.md):
 
 ## Main findings
 
-- XGBoost lost to naive on test RMSE in every comparison.
-- Transformer validation gains died on test.
-- The best GRU delta anywhere was ADRO E1 at −0.000008. Noise.
-- USD/IDR and peer features never helped twice in a row.
+- XGBoost showed no consistent out-of-sample evidence against naive on
+  test RMSE.
+- Transformer validation improvements did not persist consistently on the
+  final test.
+- The largest GRU improvement anywhere was very small and did not
+  generalize across equities or feature groups.
+- USD/IDR and peer features showed no consistent out-of-sample evidence.
 - My reading: more information and more complexity do not automatically
   produce better out-of-sample forecasts. I report the misses instead of
-  burying them.
+  hiding them.
 
 ## Risk analysis
 

@@ -216,6 +216,67 @@ def _sequence_metric_row(
     }
 
 
+def _gru_network(torch_module: Any, channels: int, hidden_size: int) -> Any:
+    class GRUNetwork(torch_module.nn.Module):
+        def __init__(self) -> None:
+            super().__init__()
+            self.gru = torch_module.nn.GRU(
+                input_size=channels,
+                hidden_size=hidden_size,
+                num_layers=1,
+                batch_first=True,
+            )
+            self.output = torch_module.nn.Linear(hidden_size, 1)
+
+        def forward(self, inputs: Any) -> Any:
+            _, hidden = self.gru(inputs)
+            return self.output(hidden[-1]).squeeze(-1)
+
+    return GRUNetwork()
+
+
+def _transformer_network(torch_module: Any, channels: int, candidate: TransformerCandidate) -> Any:
+    class TransformerNetwork(torch_module.nn.Module):
+        def __init__(self) -> None:
+            super().__init__()
+            self.input_projection = torch_module.nn.Linear(channels, candidate.d_model)
+            self.position_embedding = torch_module.nn.Embedding(
+                candidate.lookback, candidate.d_model
+            )
+            encoder_layer = torch_module.nn.TransformerEncoderLayer(
+                d_model=candidate.d_model,
+                nhead=candidate.nhead,
+                dim_feedforward=candidate.dim_feedforward,
+                dropout=0.0,
+                batch_first=True,
+                activation="gelu",
+            )
+            self.encoder = torch_module.nn.TransformerEncoder(encoder_layer, num_layers=1)
+            self.output = torch_module.nn.Linear(candidate.d_model, 1)
+
+        def forward(self, inputs: Any) -> Any:
+            positions = torch_module.arange(inputs.shape[1], device=inputs.device)
+            encoded = self.input_projection(inputs) + self.position_embedding(positions)
+            encoded = self.encoder(encoded)
+            return self.output(encoded[:, -1, :]).squeeze(-1)
+
+    return TransformerNetwork()
+
+
+def _torch_seed(seed: int) -> Any:
+    try:
+        import torch
+    except ImportError as exc:
+        raise ModelingError(
+            "PyTorch is required for GRU/Transformer models. Install it with "
+            "python -m pip install -e '.[deep]'"
+        ) from exc
+    torch.manual_seed(seed)
+    torch.set_num_threads(1)
+    torch.use_deterministic_algorithms(True)
+    return torch
+
+
 @dataclass
 class _GRUFitted:
     candidate: GRUCandidate
@@ -282,22 +343,7 @@ def _train_gru_candidate(
         )
     )
 
-    class GRUNetwork(torch.nn.Module):
-        def __init__(self) -> None:
-            super().__init__()
-            self.gru = torch.nn.GRU(
-                input_size=channels,
-                hidden_size=candidate.hidden_size,
-                num_layers=1,
-                batch_first=True,
-            )
-            self.output = torch.nn.Linear(candidate.hidden_size, 1)
-
-        def forward(self, inputs: Any) -> Any:
-            _, hidden = self.gru(inputs)
-            return self.output(hidden[-1]).squeeze(-1)
-
-    model = GRUNetwork()
+    model = _gru_network(torch, channels, candidate.hidden_size)
     optimizer = torch.optim.Adam(
         model.parameters(),
         lr=candidate.learning_rate,
@@ -421,29 +467,7 @@ def _train_transformer_candidate(
         )
     )
 
-    class TransformerNetwork(torch.nn.Module):
-        def __init__(self) -> None:
-            super().__init__()
-            self.input_projection = torch.nn.Linear(channels, candidate.d_model)
-            self.position_embedding = torch.nn.Embedding(candidate.lookback, candidate.d_model)
-            encoder_layer = torch.nn.TransformerEncoderLayer(
-                d_model=candidate.d_model,
-                nhead=candidate.nhead,
-                dim_feedforward=candidate.dim_feedforward,
-                dropout=0.0,
-                batch_first=True,
-                activation="gelu",
-            )
-            self.encoder = torch.nn.TransformerEncoder(encoder_layer, num_layers=1)
-            self.output = torch.nn.Linear(candidate.d_model, 1)
-
-        def forward(self, inputs: Any) -> Any:
-            positions = torch.arange(inputs.shape[1], device=inputs.device)
-            encoded = self.input_projection(inputs) + self.position_embedding(positions)
-            encoded = self.encoder(encoded)
-            return self.output(encoded[:, -1, :]).squeeze(-1)
-
-    model = TransformerNetwork().to(device)
+    model = _transformer_network(torch, channels, candidate).to(device)
     optimizer = torch.optim.Adam(
         model.parameters(),
         lr=candidate.learning_rate,
@@ -498,6 +522,101 @@ def _train_transformer_candidate(
         candidate.name,
     )
     return fitted
+
+
+def _dev_tensors(
+    torch_module: Any,
+    dev: SequenceDataset,
+) -> tuple[Any, Any, StandardScaler, StandardScaler, int]:
+    """Scale development sequences with dev-only scalers; return tensors."""
+    channels = dev.features.shape[-1]
+    feature_scaler = StandardScaler()
+    feature_scaler.fit(dev.features.reshape(-1, channels))
+    target_scaler = StandardScaler()
+    target_scaler.fit(dev.targets.reshape(-1, 1))
+    flat = dev.features.reshape(-1, channels)
+    scaled = feature_scaler.transform(flat).reshape(dev.features.shape)
+    inputs = torch_module.from_numpy(scaled.astype(np.float32, copy=False))
+    scaled_targets = target_scaler.transform(dev.targets.reshape(-1, 1)).ravel()
+    labels = torch_module.from_numpy(scaled_targets.astype(np.float32, copy=False))
+    return inputs, labels, feature_scaler, target_scaler, channels
+
+
+def _train_gru_final(
+    candidate: GRUCandidate,
+    dev: SequenceDataset,
+    epochs: int,
+    seed: int,
+) -> _GRUFitted:
+    """Retrain a GRU on all pre-test development data for a fixed epoch count.
+
+    The epoch count comes from development folds only (median best epoch).
+    No early stopping here: there is no held-out set left inside dev, and
+    the final test must stay untouched.
+    """
+    if epochs < 1:
+        raise ModelingError("Final GRU retraining needs at least 1 epoch.")
+    torch = _torch_seed(seed)
+    inputs, labels, feature_scaler, target_scaler, channels = _dev_tensors(torch, dev)
+    model = _gru_network(torch, channels, candidate.hidden_size)
+    optimizer = torch.optim.Adam(
+        model.parameters(),
+        lr=candidate.learning_rate,
+        weight_decay=candidate.weight_decay,
+    )
+    loss_fn = torch.nn.MSELoss()
+    model.train()
+    for _ in range(epochs):
+        optimizer.zero_grad(set_to_none=True)
+        loss = loss_fn(model(inputs), labels)
+        loss.backward()
+        optimizer.step()
+    return _GRUFitted(
+        candidate=candidate,
+        model=model,
+        feature_scaler=feature_scaler,
+        target_scaler=target_scaler,
+        validation_row={},
+        best_epoch=epochs,
+        parameter_count=sum(parameter.numel() for parameter in model.parameters()),
+        framework_version=str(torch.__version__),
+    )
+
+
+def _train_transformer_final(
+    candidate: TransformerCandidate,
+    dev: SequenceDataset,
+    epochs: int,
+    seed: int,
+) -> _TransformerFitted:
+    """Retrain a Transformer on all pre-test development data (fixed epochs)."""
+    if epochs < 1:
+        raise ModelingError("Final Transformer retraining needs at least 1 epoch.")
+    torch = _torch_seed(seed)
+    inputs, labels, feature_scaler, target_scaler, channels = _dev_tensors(torch, dev)
+    model = _transformer_network(torch, channels, candidate)
+    optimizer = torch.optim.Adam(
+        model.parameters(),
+        lr=candidate.learning_rate,
+        weight_decay=candidate.weight_decay,
+    )
+    loss_fn = torch.nn.MSELoss()
+    model.train()
+    for _ in range(epochs):
+        optimizer.zero_grad(set_to_none=True)
+        loss = loss_fn(model(inputs), labels)
+        loss.backward()
+        optimizer.step()
+    return _TransformerFitted(
+        candidate=candidate,
+        model=model,
+        feature_scaler=feature_scaler,
+        target_scaler=target_scaler,
+        validation_row={},
+        best_epoch=epochs,
+        parameter_count=sum(parameter.numel() for parameter in model.parameters()),
+        framework_version=str(torch.__version__),
+    )
 
 
 def _model_details(

@@ -59,9 +59,10 @@ Fold-selected winner vs Naive on the frozen final test (E0):
 | PTBA | Transformer lookback10_d32_heads4_ff64 | 0.020056 | 0.019960 |
 | ITMG | GRU lookback10_hidden32 | 0.017493 | 0.017460 |
 
-My read of the ladder: plain ML with XGBoost added nothing over Naive.
-GRU matched Naive without clearly beating it. Transformer complexity paid
-nothing (PTBA came out worse than Naive, and ITMG E2 printed 0.018816
+My read of the ladder: plain ML with XGBoost showed no consistent
+out-of-sample evidence over Naive. GRU matched Naive without clearly
+beating it. Transformer complexity showed no consistent out-of-sample
+evidence (PTBA came out worse than Naive, and ITMG E2 printed 0.018816
 against 0.017460).
 
 ## 5. External-feature ablation
@@ -74,15 +75,17 @@ Fold-selected model test RMSE and delta vs E0 (negative = improvement):
 | PTBA | 0.020056 | −0.000016 | −0.000045 | −0.000044 |
 | ITMG | 0.017493 | +0.000072 | +0.001323 | +0.000107 |
 
-H1 on USD/IDR: deltas at 1e-05 scale with mixed signs. No evidence of
-value. H2 on peers: the ITMG E2 transformer falls apart (+0.0013), and
-nothing else repeats. H3 on the combo: nothing on top of E0.
+H1 on USD/IDR: deltas at 1e-05 scale with mixed signs. No consistent
+out-of-sample evidence. H2 on peers: the ITMG E2 transformer improvement
+seen on validation did not persist on the final test (+0.0013), and nothing
+else repeats. H3 on the combo: nothing on top of E0.
 
 ## 6. Cross-equity consistency
 
 No feature group improves all three equities; no model beats Naive on all
 three. The only negative deltas (ADRO E1, PTBA E1/E2/E3) sit at or under
-5e-05. That is noise scale, and another equity contradicts each one.
+5e-05. The improvements were very small and did not generalize, with
+another equity contradicting each one.
 
 ## 7. Final-test results
 

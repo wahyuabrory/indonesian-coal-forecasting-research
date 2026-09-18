@@ -15,28 +15,9 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
+          python -m pip install -r requirements.lock
           python -m pip install -e .
-          python -m pip install pytest
       - name: Unit tests
         run: python -m pytest tests/ -q
-      - name: Smoke experiment (baseline + XGBoost, cached snapshots only)
-        run: |
-          python - <<'EOF'
-          from pathlib import Path
-          from coal_forecasting.config import load_config
-          from coal_forecasting.data import load_snapshots
-          from dataclasses import replace
-          from coal_forecasting.features import build_feature_dataset
-          from coal_forecasting.modeling import evaluate, split_dataset
-          config = load_config(Path("configs/baseline.toml"))
-          try:
-              snaps = load_snapshots(config)
-          except Exception as exc:
-              print(f"smoke skipped (no cache/network): {exc}")
-              raise SystemExit(0)
-          for target in config.target_symbols:
-              dataset, cols = build_feature_dataset(snaps, target, replace(config.features, group="E0"))
-              parts = split_dataset(dataset, cols, config)
-              result = evaluate(parts, cols, config, "both")
-              print(target, result.selected_model, len(result.metrics))
-          EOF
+      - name: Offline smoke experiment (deterministic synthetic data)
+        run: python3 scripts/smoke_offline.py
