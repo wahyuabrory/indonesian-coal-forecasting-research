@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "indonesian-coal-forecasting-research"
+version = "0.1.0"
+description = "Leak-safe daily return forecasting baselines, GRU, and Transformer experiments for Indonesian equities"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "scikit-learn>=1.3",
+  "yfinance>=0.2.40",
+  "xgboost>=2.0",
+]
+
+[project.optional-dependencies]
+deep = [
+  "torch>=2.5",
+]
+
+[project.scripts]
+coal-forecast = "coal_forecasting.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Local Yahoo snapshots and run outputs.
+data/yahoo_cache/
+outputs/
+
+# Local tooling noise.
+.DS_Store
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+adro gru haqi.ipynb

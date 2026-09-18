@@ -1,0 +1,99 @@
+# Dates use ISO calendar dates. Start is inclusive; every end is exclusive.
+[data]
+symbols = ["ADRO.JK", "PTBA.JK", "ITMG.JK", "IDR=X"]
+start_inclusive = "2016-01-01"
+end_exclusive = "2026-05-01"
+interval = "1d"
+cache_dir = "data/yahoo_cache"
+
+[splits]
+train_end_exclusive = "2022-01-01"
+validation_end_exclusive = "2023-01-01"
+test_end_exclusive = "2026-05-01"
+min_rows = 20
+
+[features]
+group = "E0"
+return_lags = [1, 2, 3, 5, 10]
+rolling_windows = [5, 20]
+usd_idr_availability_lag = 1
+peer_availability_lag = 1
+peers = ["ADRO.JK", "PTBA.JK", "ITMG.JK"]
+
+[risk]
+confidence = 0.95
+portfolio_value_idr = 1000000
+
+[run]
+seed = 42
+output_dir = "outputs"
+
+[research]
+forecast_timestamp_assumption = "A row dated t is known after the target equity's daily close. Its target is the log return from that close to the next observed target-equity trading day. External features use a conservative one-observation availability lag unless the feature configuration says otherwise."
+adro_aadi_structural_break_caveat = "The ADRO/AADI restructuring and ticker history create a structural break around late 2024. This baseline does not adjust for that break, so results must not be read as stable pre/post-event evidence."
+coal_feature_policy = "No coal feature is included until a release-dated HBA input and its publication-time rule are available."
+
+[xgboost]
+selection_metric = "rmse"
+
+[[xgboost.candidates]]
+name = "depth2_lr005"
+n_estimators = 100
+max_depth = 2
+learning_rate = 0.05
+subsample = 1.0
+colsample_bytree = 1.0
+min_child_weight = 1
+reg_lambda = 1.0
+
+[[xgboost.candidates]]
+name = "depth3_lr003"
+n_estimators = 150
+max_depth = 3
+learning_rate = 0.03
+subsample = 1.0
+colsample_bytree = 1.0
+min_child_weight = 1
+reg_lambda = 1.0
+
+[gru]
+[[gru.candidates]]
+name = "lookback5_hidden16"
+lookback = 5
+hidden_size = 16
+learning_rate = 0.001
+weight_decay = 0.0001
+max_epochs = 100
+patience = 12
+
+[[gru.candidates]]
+name = "lookback10_hidden32"
+lookback = 10
+hidden_size = 32
+learning_rate = 0.001
+weight_decay = 0.0001
+max_epochs = 100
+patience = 12
+
+[transformer]
+[[transformer.candidates]]
+name = "lookback5_d16_heads2_ff32"
+lookback = 5
+d_model = 16
+nhead = 2
+dim_feedforward = 32
+learning_rate = 0.001
+weight_decay = 0.0001
+max_epochs = 100
+patience = 12
+
+[[transformer.candidates]]
+name = "lookback10_d32_heads4_ff64"
+lookback = 10
+d_model = 32
+nhead = 4
+dim_feedforward = 64
+learning_rate = 0.001
+weight_decay = 0.0001
+max_epochs = 100
+patience = 12
