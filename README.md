@@ -51,7 +51,7 @@ Naive / XGBoost / GRU / Transformer
       ↓
 Feature ablation
       ↓
-Frozen final test
+Frozen evaluation period
       ↓
 Historical VaR
       ↓
@@ -124,7 +124,7 @@ Per-question results in [`docs/results.md`](docs/results.md):
 - XGBoost showed no consistent out-of-sample evidence against naive on
   test RMSE.
 - Transformer validation improvements did not persist consistently on the
-  final test.
+  frozen evaluation period.
 - The largest GRU improvement anywhere was very small and did not
   generalize across equities or feature groups.
 - USD/IDR and peer features showed no consistent out-of-sample evidence.

@@ -106,7 +106,8 @@ Full table in `results/final_test_metrics.csv`: 48 rows, all four families
 for every target and feature group. Each frozen model was refit on
 pre-2023 development data (deep models at their median fold best epoch)
 and scored once on the frozen evaluation period. No family outperformed
-Naive; differences were small and not consistent across equities or
+Naive consistently. A few configurations produced slightly lower RMSE, but
+the differences were small and did not generalize across equities or
 feature groups.
 
 ## 8. Secondary VaR
