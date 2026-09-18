@@ -1,9 +1,14 @@
 {
-  "run_at_utc": "2026-09-18T11:22:44.717986+00:00",
-  "git_commit": "8b5d4a49246fcb2eed7c1438c70a4c8b09b18aa9",
+  "run_at_utc": "2026-09-18T12:29:50.699530+00:00",
+  "code_commit": "",
+  "worktree_dirty": false,
+  "worktree_status": "",
   "config": "/home/abrory/code/indonesian-coal-forecasting-research/configs/baseline.toml",
+  "config_sha256": "a0958188ae51063c49be80cb29db3b960b00e2bde0b314035087d17ae0c9743a",
+  "lockfile_sha256": "fc7f149eeec948936344e155a24843079c208a25a342b4b877ebe8006eae53e4",
+  "script_sha256": "f52b9e4397dcb7c9ed75473d6d27faaa5306606052432ebbd9d58247c32da07c",
   "seed": 42,
-  "selection": "mean_fold_rmse over fold1/fold2/fold3; final test evaluated once",
+  "selection": "per-family best candidate by mean fold RMSE; all 4 families refit on dev and scored once on final test",
   "final_test": [
     "2023-01-01",
     "2026-05-01"

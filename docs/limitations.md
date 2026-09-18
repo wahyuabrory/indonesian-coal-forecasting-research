@@ -28,7 +28,9 @@ has roughly 240 scored rows and the test has 787. Small samples for
 comparing several models. Daily sequence windows can overlap, so row counts
 do not equal independent observations.
 
-The runs compare several model families and candidates across twelve target/group combinations (E3 included). This creates multiple opportunities for an isolated low error. The hindsight test-best label in [results.md](results.md) is only a descriptive comparison. It is not a valid selection rule and does not correct for multiple comparisons.
+The runs compare several model families and candidates across twelve
+target/group combinations (E3 included), scoring all four families on the
+test. This creates multiple opportunities for an isolated low error. The hindsight test-best label in [results.md](results.md) is only a descriptive comparison. It is not a valid selection rule and does not correct for multiple comparisons.
 
 Test metrics remain frozen after validation selection. That protects the reported selection procedure, but one fixed test period is still not enough to support a general performance claim.
 

@@ -150,7 +150,11 @@ def test_transformer_final_refit_uses_dev_only():
 def _results(path: str) -> pd.DataFrame:
     full = Path("results") / path
     assert full.exists(), f"Run scripts/run_expanding_validation.py first: {path} missing."
-    return pd.read_csv(full)
+    frame = pd.read_csv(full)
+    if "candidate" in frame.columns:
+        # Empty candidates serialize as blank CSV cells and read back as NaN.
+        frame["candidate"] = frame["candidate"].fillna("")
+    return frame
 
 
 def test_committed_final_test_has_four_families():
@@ -199,4 +203,4 @@ def test_offline_smoke_passes():
     )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    assert module.main() == 0
+    assert module.main([]) == 0

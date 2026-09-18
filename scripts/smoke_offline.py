@@ -42,10 +42,10 @@ def _synthetic_snapshot(symbol: str, seed: int) -> Snapshot:
                     "synthetic", "smoke")
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=ROOT / "configs/baseline.toml")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     config = load_config(args.config)
     symbols = ("ADRO.JK", "PTBA.JK", "ITMG.JK", "IDR=X")
     snapshots = {s: _synthetic_snapshot(s, SMOKE_SEED + i)

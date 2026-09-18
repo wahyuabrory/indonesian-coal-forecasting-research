@@ -78,9 +78,15 @@ def _sha256(path: Path) -> str:
 
 
 def _git(command: list[str]) -> str:
+    import shutil
+
+    git = shutil.which("git")
+    if git is None:
+        return ""
     try:
         result = subprocess.run(
-            command, capture_output=True, text=True, cwd=ROOT
+            [git, "-C", str(ROOT), *command],
+            capture_output=True, text=True, timeout=60,
         )
     except Exception:
         return ""
@@ -374,7 +380,7 @@ def main() -> int:
     summary.to_csv(results_dir / "summary.csv", index=False)
     pd.DataFrame(risk_rows).to_csv(results_dir / "risk_summary.csv", index=False)
 
-    dirty = _git(["status", "--porcelain"])
+    dirty = _git(["status", "--porcelain", "--", ".", ":!results", ":!outputs"])
     (results_dir / "run_manifest.json").write_text(json.dumps(
         {"run_at_utc": datetime.now(timezone.utc).isoformat(),
          "code_commit": _git(["rev-parse", "HEAD"]),
