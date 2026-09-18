@@ -1,92 +1,128 @@
 # Results
 
-## Scope
+Machine-readable source of truth: [`results/`](../results/) (`summary.csv`,
+`fold_metrics.csv`, `final_test_metrics.csv`, `feature_ablation.csv`,
+`risk_summary.csv`, `run_manifest.json`, `data_manifest.json`). Tables below
+are verified against those files. Figures:
+[`results/figures/`](../results/figures/).
 
-These results cover `ADRO.JK`, `PTBA.JK`, and `ITMG.JK` with three feature groups:
+Scope: `ADRO.JK`, `PTBA.JK`, `ITMG.JK`; groups E0 (own history), E1 (+USD/IDR),
+E2 (+peers, exploratory), E3 (combined). Target: next-day adjusted-close log
+return. Selection: mean fold RMSE over three expanding development folds;
+final test `[2023-01-01, 2026-05-01)` evaluated once, after freezing.
 
-- `E0`: target-equity return lags and rolling volatility.
-- `E1`: `E0` plus conservatively lagged USD/IDR return features.
-- `E2`: `E0` plus conservatively lagged peer-equity return features.
+## 1. Dataset and EDA findings
 
-The target is the next observed target-equity adjusted-close log return. RMSE is in log-return units, and lower is better. The tables use the verified files under `outputs/<target>/<feature-group>/`. Each run uses `model_mode=all`, selects on validation RMSE, and keeps the test partition out of selection.
+Requested interval `[2016-01-01, 2026-05-01)`; observed 2016-01-04 to
+2026-04-29 (ADRO/PTBA 2,541 rows, ITMG 2,542). No duplicates, no missing or
+non-finite prices. Returns are near-zero-mean, heavy-tailed (ADRO σ 0.0286,
+PTBA 0.0253, ITMG 0.0250); USD/IDR changes are an order of magnitude calmer
+(σ 0.0065). Lagged external correlations are weak. ADRO shows a late-2024
+restructuring regime shift, carried as a limitation. Full detail:
+[`eda.md`](eda.md).
 
-The results are descriptive. They do not show that any model has stable predictive power. This is one fixed validation/test split, not multi-fold stability evidence.
+## 2. Validation stability
 
-## Data snapshot and split
-
-The metadata records a requested interval of `[2016-01-01, 2026-05-01)`. The configured chronological splits are:
-
-| Partition | Configured interval | Observed dates | Rows |
-| --- | --- | --- | ---: |
-| Train | `[2016-01-01, 2022-01-01)` | 2016-02-01 to 2021-12-30 | 1,487 for ADRO/PTBA; 1,488 for ITMG |
-| Validation | `[2022-01-01, 2023-01-01)` | 2022-01-03 to 2022-12-30 | 246 |
-| Test | `[2023-01-01, 2026-05-01)` | 2023-01-02 to 2026-04-29 | 787 |
-
-The snapshot retrieval timestamps in the metadata are:
-
-| Symbol | Retrieved at UTC |
-| --- | --- |
-| `ADRO.JK` | `2026-09-18T07:58:38.532557+00:00` |
-| `PTBA.JK` | `2026-09-18T07:58:39.368953+00:00` |
-| `ITMG.JK` | `2026-09-18T07:58:40.422291+00:00` |
-| `IDR=X` | `2026-09-18T07:58:41.239144+00:00` |
-
-The recorded model framework versions are XGBoost `3.4.1` and PyTorch `2.14.0+cpu`. The configured seed is `42`.
-
-## Validation selection and test hindsight
-
-Validation selection is the model recorded as selected in `metadata.json`. The final column is different. It is the model with the lowest test RMSE after looking at the test rows. It is a hindsight comparison, not a selected model.
-
-| Target | Group | Validation-selected model | Hindsight test-best model |
-| --- | --- | --- | --- |
-| ADRO | E0 | Transformer, `lookback10_d32_heads4_ff64` | Naive |
-| ADRO | E1 | GRU, `lookback10_hidden32` | GRU |
-| ADRO | E2 | GRU, `lookback10_hidden32` | Naive |
-| PTBA | E0 | GRU, `lookback5_hidden16` | GRU |
-| PTBA | E1 | GRU, `lookback10_hidden32` | Naive |
-| PTBA | E2 | Transformer, `lookback10_d32_heads4_ff64` | Naive |
-| ITMG | E0 | Transformer, `lookback5_d16_heads2_ff32` | Naive |
-| ITMG | E1 | GRU, `lookback5_hidden16` | Naive |
-| ITMG | E2 | Transformer, `lookback5_d16_heads2_ff32` | Naive |
-
-The validation-selected models are not test winners by default. The test-best column must not be used to choose a model.
-
-## Test RMSE
-
-Values are rounded to eight decimal places. The source JSON files retain full precision.
+Mean validation RMSE across the three folds (lower is better):
 
 | Target | Group | Naive | XGBoost | GRU | Transformer |
 | --- | --- | ---: | ---: | ---: | ---: |
-| ADRO | E0 | 0.02703467 | 0.02765760 | 0.02703510 | 0.02721939 |
-| ADRO | E1 | 0.02703467 | 0.02763784 | 0.02701679 | 0.02718165 |
-| ADRO | E2 | 0.02703467 | 0.02730095 | 0.02708917 | 0.02722194 |
-| PTBA | E0 | 0.01996016 | 0.02042201 | 0.01992306 | 0.02002513 |
-| PTBA | E1 | 0.01996016 | 0.02032870 | 0.02001561 | 0.02010131 |
-| PTBA | E2 | 0.01996016 | 0.02046868 | 0.01997575 | 0.02001677 |
-| ITMG | E0 | 0.01746045 | 0.01768252 | 0.01757579 | 0.01769942 |
-| ITMG | E1 | 0.01746045 | 0.01771034 | 0.01756577 | 0.01810996 |
-| ITMG | E2 | 0.01746045 | 0.01783510 | 0.01759846 | 0.01881598 |
+| ADRO | E0 | 0.030829 | 0.030986 | 0.030774 | 0.030763 |
+| ADRO | E1 | 0.030829 | 0.031275 | 0.030776 | 0.030899 |
+| ADRO | E2 | 0.030829 | 0.031087 | 0.030463 | 0.030630 |
+| ADRO | E3 | 0.030829 | 0.031447 | 0.030576 | 0.030802 |
+| PTBA | E0 | 0.027120 | 0.027252 | 0.027040 | 0.027007 |
+| PTBA | E1 | 0.027120 | 0.027302 | 0.026990 | 0.027010 |
+| PTBA | E2 | 0.027120 | 0.027177 | 0.026881 | 0.027061 |
+| PTBA | E3 | 0.027120 | 0.027439 | 0.026831 | 0.027113 |
+| ITMG | E0 | 0.029358 | 0.029769 | 0.029207 | 0.029337 |
+| ITMG | E1 | 0.029358 | 0.029544 | 0.029080 | 0.029220 |
+| ITMG | E2 | 0.029358 | 0.029363 | 0.029150 | 0.029181 |
+| ITMG | E3 | 0.029358 | 0.029552 | 0.029162 | 0.029240 |
 
-External features do not improve test RMSE consistently. XGBoost does not beat the naive model on test RMSE in any of the nine comparisons. The only lower test RMSE values are small GRU gains for ADRO E1 and PTBA E0. They do not repeat across companies or feature groups. Transformer validation gains do not persist on test.
+GRU wins most folds; XGBoost never beats Naive on mean fold RMSE.
+Fold-selected winners per group are recorded in `results/summary.csv`.
 
-## Unconditional historical VaR
+## 3. Naive baseline
 
-`risk.json` reports a one-day, 95% unconditional historical-simulation estimate. Calibration uses returns dated in `[2016-01-01, 2023-01-01)`. Breaches use returns dated in `[2023-01-01, 2026-05-01)`. The risk calculation uses adjusted-close log returns, not forecasts, and it does not affect model selection.
+The zero-return forecast is competitive everywhere because daily mean
+returns sit near zero. Any model has to beat it to claim value. Almost none
+does (see section 7).
 
-| Target | VaR log-return magnitude | Simple loss fraction | Estimated loss on IDR 1,000,000 | Final-test breaches |
+## 4. Model-complexity comparison
+
+Fold-selected winner vs Naive on the frozen final test (E0):
+
+| Target | Winner | Winner RMSE | Naive RMSE |
+| --- | --- | ---: | ---: |
+| ADRO | GRU lookback10_hidden32 | 0.027035 | 0.027035 |
+| PTBA | Transformer lookback10_d32_heads4_ff64 | 0.020056 | 0.019960 |
+| ITMG | GRU lookback10_hidden32 | 0.017493 | 0.017460 |
+
+My read of the ladder: plain ML with XGBoost added nothing over Naive.
+GRU matched Naive without clearly beating it. Transformer complexity paid
+nothing (PTBA came out worse than Naive, and ITMG E2 printed 0.018816
+against 0.017460).
+
+## 5. External-feature ablation
+
+Fold-selected model test RMSE and delta vs E0 (negative = improvement):
+
+| Target | E0 | E1 Δ | E2 Δ | E3 Δ |
 | --- | ---: | ---: | ---: | ---: |
-| ADRO | 0.04284938 | 0.04194432 | IDR 41,944.32 | 26/788, 0.03299492 |
-| PTBA | 0.03872644 | 0.03798616 | IDR 37,986.16 | 18/788, 0.02284264 |
-| ITMG | 0.03993283 | 0.03914602 | IDR 39,146.02 | 20/788, 0.02538071 |
+| ADRO | 0.027035 | −0.000008 | +0.000054 | +0.000124 |
+| PTBA | 0.020056 | −0.000016 | −0.000045 | −0.000044 |
+| ITMG | 0.017493 | +0.000072 | +0.001323 | +0.000107 |
 
-These are unconditional historical estimates. They are not forecast-conditional risk and do not promise a coverage rate. Values repeat across feature groups for a target because the calculation uses the same target snapshot and split.
+H1 on USD/IDR: deltas at 1e-05 scale with mixed signs. No evidence of
+value. H2 on peers: the ITMG E2 transformer falls apart (+0.0013), and
+nothing else repeats. H3 on the combo: nothing on top of E0.
+
+## 6. Cross-equity consistency
+
+No feature group improves all three equities; no model beats Naive on all
+three. The only negative deltas (ADRO E1, PTBA E1/E2/E3) sit at or under
+5e-05. That is noise scale, and another equity contradicts each one.
+
+## 7. Final-test results
+
+Full table in `results/final_test_metrics.csv`. Every fold-selected winner
+was scored once on the untouched test alongside the naive reference. In all
+12 target/group comparisons the winner fails to beat Naive by any
+meaningful margin (best case: ADRO E1 −0.000008).
+
+## 8. Secondary VaR
+
+One-day 95% unconditional historical VaR (calibration before 2023-01-01):
+
+| Target | VaR magnitude | Loss on IDR 1,000,000 | Test breaches |
+| --- | ---: | ---: | --- |
+| ADRO | 0.042849 | IDR 41,944.32 | 26/788, 0.0330 |
+| PTBA | 0.038726 | IDR 37,986.16 | 18/788, 0.0228 |
+| ITMG | 0.039933 | IDR 39,146.02 | 20/788, 0.0254 |
+
+Descriptive only. The VaR uses no forecasts, drives no selection, and
+guarantees no coverage. Values repeat across groups by construction.
+
+## 9. Main research findings
+
+- H1 to H3: no consistent evidence that USD/IDR, peer, or combined
+  external information improves next-day return forecasts.
+- H4 to H5: no consistent evidence that sequence deep learning or
+  Transformer complexity beats the naive benchmark out of sample.
+- What holds up: more information and more complexity do not automatically
+  produce better out-of-sample financial forecasts.
+- These are descriptive results from three folds and one test period. They
+  are not causal claims and not general performance claims.
 
 ## Output files
 
-For each target and group, see:
+- `results/fold_metrics.csv` holds every candidate by fold validation metric.
+- `results/final_test_metrics.csv` holds frozen test metrics for winners plus naive.
+- `results/feature_ablation.csv` holds test RMSE deltas against E0.
+- `results/risk_summary.csv` holds VaR per target.
+- `results/run_manifest.json` holds commit, config, seed, and library versions.
+- `results/data_manifest.json` holds snapshot hashes and retrieval times.
 
-- `metrics.json` for validation and frozen-test metrics.
-- `metadata.json` for snapshot identity, dates, split rows, selection, and framework versions.
-- `risk.json` for the secondary risk calculation.
-
-The method contract is in [`methodology.md`](methodology.md). The data and model caveats are in [`limitations.md`](limitations.md).
+Method contract: [`methodology.md`](methodology.md). Caveats:
+[`limitations.md`](limitations.md).

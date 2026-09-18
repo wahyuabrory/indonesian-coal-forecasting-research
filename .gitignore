@@ -14,4 +14,9 @@ outputs/
 .mypy_cache/
 .ruff_cache/
 
+# Rendered evidence report; source of truth is docs/*.md + results/.
+docs/index.html
+
+# The original exploration notebook stays local; it is not part of the
+# published research pipeline (see README origin note).
 adro gru haqi.ipynb

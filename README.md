@@ -1,53 +1,179 @@
 # Indonesian coal forecasting research
 
-This repository contains the accepted daily-return baseline and compact GRU and Transformer experiments for `ADRO.JK`, `PTBA.JK`, and `ITMG.JK`. The verified outputs include naive, XGBoost, GRU, and Transformer metrics plus a separate unconditional historical-risk summary.
+Short-horizon return forecasting for Indonesian coal equities: do
+literature-supported external market variables improve next-day return
+forecasts over stock history alone, and does more model complexity pay?
 
-The pipeline uses Yahoo Finance daily snapshots, adjusted-close log returns, leak-safe lagged features, a zero-return benchmark, bounded XGBoost, and optional CPU PyTorch sequence models. The original `adro gru haqi.ipynb` file is kept unchanged. HBA backfilling, charts, and model artifact dumps remain out of scope.
+The short answer is no. Across ADRO, PTBA, and ITMG, external variables
+and model complexity did not consistently beat the zero-return naive
+benchmark. Small GRU gains show up in isolated folds and groups but vanish
+across equities. Details in [`docs/results.md`](docs/results.md).
+Machine-readable evidence in [`results/`](results/).
 
-Read the [methodology](docs/methodology.md), [results](docs/results.md), [literature review](docs/literature-review.md), and [limitations](docs/limitations.md) before interpreting a result.
+## Research question
 
-## Install
+> Do literature-supported external market variables improve next-day return
+> forecasting for Indonesian coal equities compared with stock-history-only
+> models?
 
-Use the default/global Python environment, not `uv`:
+Secondary questions: does extra complexity, from Naive to XGBoost to GRU
+to Transformer, buy consistent out-of-sample improvement, and does anything
+generalize across ADRO, PTBA, and ITMG?
 
-```bash
-python -m pip install -e .
+## Why this problem
+
+Indonesian coal equities are exposed to shared external shocks (coal
+demand, exchange rates) and to their own trading dynamics. Raw prices are
+near-persistent. Tomorrow's price is roughly today's price, so the project
+forecasts next-day adjusted-close log returns
+`r(t+1) = log(P(t+1)/P(t))`. Returns strip out persistence and force models
+to earn every improvement.
+
+## Research flow
+
+```text
+Literature review
+      ↓
+Research hypotheses
+      ↓
+Data acquisition
+      ↓
+Data audit & EDA
+      ↓
+Preprocessing
+      ↓
+Feature engineering
+      ↓
+Expanding-window validation
+      ↓
+Naive / XGBoost / GRU / Transformer
+      ↓
+Feature ablation
+      ↓
+Frozen final test
+      ↓
+Historical VaR
+      ↓
+Research conclusions
 ```
 
-The package requires Python 3.11 or newer. `yfinance` is used only when a requested snapshot is not cached. XGBoost is needed for the default model mode. PyTorch is optional and is required only for `gru`, `transformer`, and `all`:
+## Data
+
+Yahoo Finance daily snapshots for `ADRO.JK`, `PTBA.JK`, `ITMG.JK`, and
+`IDR=X` over `[2016-01-01, 2026-05-01)`. See [`docs/data.md`](docs/data.md)
+for provenance and [`docs/eda.md`](docs/eda.md) for findings. Raw snapshots
+stay local; `results/data_manifest.json` records SHA-256 hashes so every
+result traces to its exact dataset.
+
+## Exploratory analysis
+
+`notebooks/01_data_audit.ipynb` (coverage, validity) and
+`notebooks/02_eda.ipynb` (returns, volatility, lagged relationships,
+ADRO/AADI event window). Key facts: returns are near-zero-mean and
+heavy-tailed; USD/IDR moves are an order of magnitude calmer than equity
+returns; ADRO shows a late-2024 regime shift carried as a limitation.
+
+## Features
+
+| Group | Content | Hypothesis |
+| --- | --- | --- |
+| E0 | own return lags + rolling volatility | baseline |
+| E1 | E0 + lagged USD/IDR | H1 |
+| E2 | E0 + lagged peer returns (exploratory) | H2 |
+| E3 | E0 + USD/IDR + peers | H3 |
+
+Every external input uses a one-observation availability lag with backward
+as-of alignment. No future information enters. No coal-price feature exists
+yet. One enters only with a release-dated history and a publication-timing
+rule.
+
+## Models
+
+Zero-return Naive, then XGBoost with bounded candidates, then a small GRU
+with early stopping, then a compact one-layer Transformer. The Transformer
+is a complexity experiment, not an expected winner. Every family sees at
+most the previous 20 trading days. Full contract in
+[`docs/methodology.md`](docs/methodology.md).
+
+## Validation design
+
+Three expanding development folds (validate 2020, 2021, 2022) with per-fold
+refit preprocessing, aggregated by mean RMSE for all decisions. The final
+test `[2023-01-01, 2026-05-01)` is evaluated once, after freezing. Test
+rows never influence selection. See
+[`docs/research-design.md`](docs/research-design.md).
+
+## Results
+
+Per-question results in [`docs/results.md`](docs/results.md):
+
+1. Dataset and EDA findings
+2. Validation stability across folds
+3. Naive baseline
+4. Model-complexity comparison
+5. External-feature ablation
+6. Cross-equity consistency
+7. Final-test results
+8. Secondary VaR
+9. Main research findings
+
+## Main findings
+
+- XGBoost lost to naive on test RMSE in every comparison.
+- Transformer validation gains died on test.
+- The best GRU delta anywhere was ADRO E1 at −0.000008. Noise.
+- USD/IDR and peer features never helped twice in a row.
+- My reading: more information and more complexity do not automatically
+  produce better out-of-sample forecasts. I report the misses instead of
+  burying them.
+
+## Risk analysis
+
+One-day 95% unconditional historical-simulation VaR over adjusted-close log
+returns. It is a secondary descriptive analysis. It uses no forecasts and
+drives no selection. See `results/risk_summary.csv`.
+
+## Reproduce the experiment
+
+Use the default/global Python environment:
 
 ```bash
-python -m pip install -e '.[deep]'
+pip install -r requirements.lock
+pip install -e .
+pytest tests/ -q
 ```
 
-## Run
-
-The checked-in config is [`configs/baseline.toml`](configs/baseline.toml). It owns the symbols, inclusive/exclusive dates, chronological split boundaries, lags, seed, bounded XGBoost candidates, and two candidates for each deep model.
+Runs (first run downloads snapshots; later runs reuse the validated cache):
 
 ```bash
-# One target, E0 stock-history features, naive plus XGBoost
+# Single target/group, naive + XGBoost
 coal-forecast --target ADRO.JK --feature-group E0
-
-# All three targets
-coal-forecast --target all --feature-group E0
-
-# Reuse existing snapshots without network access
-coal-forecast --target all --feature-group E1 --model baseline
-
-# Run the two configured GRU candidates
-coal-forecast --target ADRO.JK --feature-group E0 --model gru
-
-# Run the two configured Transformer candidates
-coal-forecast --target ADRO.JK --feature-group E0 --model transformer
-
-# Compare the naive baseline and best candidate from each model family
-coal-forecast --target all --feature-group E0 --model all
+# Full comparison for all targets (E3 included)
+coal-forecast --target all --feature-group E3 --model all
+# Full expanding-window research experiment (writes results/*.csv + manifests)
+python3 scripts/run_expanding_validation.py
 ```
 
-The first run downloads four daily snapshots (`ADRO.JK`, `PTBA.JK`, `ITMG.JK`, and `IDR=X`) into `data/yahoo_cache/`. Later runs reuse a cache only when its JSON sidecar matches the active symbol, dates, and interval. A mismatch stops the run; use `--refresh` to replace it.
+`results/` holds the committed machine-readable evidence: `summary.csv`,
+`fold_metrics.csv`, `final_test_metrics.csv`, `feature_ablation.csv`,
+`risk_summary.csv`, `run_manifest.json`, `data_manifest.json`, and
+`figures/`.
 
-Each target writes `metrics.csv`, `metrics.json`, `metadata.json`, and `risk.json` below `outputs/<target>/<feature-group>/`. Metadata records snapshot retrieval times, split dates, train-only scaling rules, framework versions, candidate parameters, best epochs, and trainable parameter counts. In `both` mode, validation compares the naive baseline with the best XGBoost candidate. In `all` mode, validation compares the naive baseline and the best candidate from XGBoost, GRU, and Transformer, while all four frozen test metrics remain visible. Test rows are not used for selection.
+## Limitations
 
-`risk.json` is a secondary descriptive analysis. It reports one-day unconditional historical-simulation VaR from adjusted-close log returns before the final-test origin, then counts breaches in the final-test returns. It is not conditioned on forecasts and is not used for model selection, so its VaR values repeat across feature groups and model modes for the same snapshot and split. Verified risk values and their caveats are documented in [`docs/results.md`](docs/results.md).
+Yahoo revisions, small daily samples, one market, three equities, the
+ADRO/AADI break, timestamp uncertainty, no causal claims, no trading
+evaluation. Full list in [`docs/limitations.md`](docs/limitations.md).
 
-See [`docs/methodology.md`](docs/methodology.md) for the data contract, anti-leakage rules, and risk calculation definition. Do not interpret a run as evidence that ADRO relationships are stable across the ADRO/AADI structural break.
+## Origin
+
+I started from an ADRO GRU closing-price experiment
+(`adro gru haqi.ipynb`, kept local and unchanged). Its honest result was
+that USD/IDR did not automatically help. I rebuilt it as a reproducible
+multi-equity research pipeline with return targets, three equities,
+ablation, and temporal validation.
+
+## References
+
+[`docs/literature-review.md`](docs/literature-review.md) and
+[`references/references.bib`](references/references.bib).

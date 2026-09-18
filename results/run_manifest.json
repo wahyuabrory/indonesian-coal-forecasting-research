@@ -1,0 +1,18 @@
+{
+  "run_at_utc": "2026-09-18T11:22:44.717986+00:00",
+  "git_commit": "8b5d4a49246fcb2eed7c1438c70a4c8b09b18aa9",
+  "config": "/home/abrory/code/indonesian-coal-forecasting-research/configs/baseline.toml",
+  "seed": 42,
+  "selection": "mean_fold_rmse over fold1/fold2/fold3; final test evaluated once",
+  "final_test": [
+    "2023-01-01",
+    "2026-05-01"
+  ],
+  "python": "3.14.5",
+  "versions": {
+    "torch": "2.14.0+cpu",
+    "xgboost": "3.4.1",
+    "pandas": "3.0.5",
+    "numpy": "2.5.3"
+  }
+}

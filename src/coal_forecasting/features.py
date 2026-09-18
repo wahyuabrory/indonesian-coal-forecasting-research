@@ -83,6 +83,53 @@ def _add_asof_features(
         dataset[column] = aligned[column].to_numpy()
 
 
+def _add_fx_features(
+    dataset: pd.DataFrame,
+    snapshots: dict[str, Snapshot],
+    feature_config: FeatureConfig,
+    feature_columns: list[str],
+) -> None:
+    if "IDR=X" not in snapshots:
+        raise DataValidationError("Feature group E1/E3 requires an IDR=X snapshot.")
+    fx = _feature_frame(
+        snapshots["IDR=X"],
+        prefix="usd_idr",
+        lags=feature_config.return_lags,
+        rolling_windows=feature_config.rolling_windows,
+        availability_lag=feature_config.usd_idr_availability_lag,
+    )
+    fx_columns = [column for column in fx.columns if column != "Date"]
+    _add_asof_features(dataset, fx, fx_columns)
+    feature_columns.extend(fx_columns)
+
+
+def _add_peer_features(
+    dataset: pd.DataFrame,
+    snapshots: dict[str, Snapshot],
+    target_symbol: str,
+    feature_config: FeatureConfig,
+    feature_columns: list[str],
+) -> None:
+    peers = [peer for peer in feature_config.peers if peer != target_symbol]
+    if not peers:
+        raise DataValidationError(
+            f"Feature group E2/E3 has no peer symbols for target {target_symbol}."
+        )
+    for peer in peers:
+        if peer not in snapshots:
+            raise DataValidationError(f"Feature group E2/E3 requires peer snapshot {peer}.")
+        peer_key = peer.replace(".", "_").replace("=", "_")
+        peer_features = _feature_frame(
+            snapshots[peer],
+            prefix=f"peer_{peer_key}",
+            lags=feature_config.return_lags,
+            availability_lag=feature_config.peer_availability_lag,
+        )
+        peer_columns = [column for column in peer_features.columns if column != "Date"]
+        _add_asof_features(dataset, peer_features, peer_columns)
+        feature_columns.extend(peer_columns)
+
+
 def build_feature_dataset(
     snapshots: dict[str, Snapshot],
     target_symbol: str,
@@ -90,6 +137,8 @@ def build_feature_dataset(
 ) -> tuple[pd.DataFrame, list[str]]:
     if target_symbol not in snapshots:
         raise DataValidationError(f"No validated snapshot is available for target {target_symbol}.")
+    if feature_config.group not in ("E0", "E1", "E2", "E3"):
+        raise DataValidationError(f"Unknown feature group {feature_config.group!r}.")
     target = snapshots[target_symbol].frame
     dataset = pd.DataFrame({"Date": target["Date"]})
     log_close = np.log(target["Adj Close"])
@@ -105,39 +154,11 @@ def build_feature_dataset(
     for column in feature_columns:
         dataset[column] = own[column].to_numpy()
 
-    if feature_config.group == "E1":
-        if "IDR=X" not in snapshots:
-            raise DataValidationError("Feature group E1 requires an IDR=X snapshot.")
-        fx = _feature_frame(
-            snapshots["IDR=X"],
-            prefix="usd_idr",
-            lags=feature_config.return_lags,
-            rolling_windows=feature_config.rolling_windows,
-            availability_lag=feature_config.usd_idr_availability_lag,
-        )
-        fx_columns = [column for column in fx.columns if column != "Date"]
-        _add_asof_features(dataset, fx, fx_columns)
-        feature_columns.extend(fx_columns)
+    if feature_config.group in ("E1", "E3"):
+        _add_fx_features(dataset, snapshots, feature_config, feature_columns)
 
-    if feature_config.group == "E2":
-        peers = [peer for peer in feature_config.peers if peer != target_symbol]
-        if not peers:
-            raise DataValidationError(
-                f"Feature group E2 has no peer symbols for target {target_symbol}."
-            )
-        for peer in peers:
-            if peer not in snapshots:
-                raise DataValidationError(f"Feature group E2 requires peer snapshot {peer}.")
-            peer_key = peer.replace(".", "_").replace("=", "_")
-            peer_features = _feature_frame(
-                snapshots[peer],
-                prefix=f"peer_{peer_key}",
-                lags=feature_config.return_lags,
-                availability_lag=feature_config.peer_availability_lag,
-            )
-            peer_columns = [column for column in peer_features.columns if column != "Date"]
-            _add_asof_features(dataset, peer_features, peer_columns)
-            feature_columns.extend(peer_columns)
+    if feature_config.group in ("E2", "E3"):
+        _add_peer_features(dataset, snapshots, target_symbol, feature_config, feature_columns)
 
     if dataset["Date"].duplicated().any():
         raise DataValidationError(f"{target_symbol} feature dataset contains duplicate dates.")
@@ -176,9 +197,9 @@ def build_sequence_dataset(
     _add_asof_features(dataset, own, ["own_return"])
     channel_columns.append("own_return")
 
-    if feature_config.group == "E1":
+    if feature_config.group in ("E1", "E3"):
         if "IDR=X" not in snapshots:
-            raise DataValidationError("Feature group E1 requires an IDR=X snapshot.")
+            raise DataValidationError("Feature group E1/E3 requires an IDR=X snapshot.")
         fx = _return_channel(
             snapshots["IDR=X"],
             "usd_idr",
@@ -187,15 +208,15 @@ def build_sequence_dataset(
         _add_asof_features(dataset, fx, ["usd_idr_return"])
         channel_columns.append("usd_idr_return")
 
-    if feature_config.group == "E2":
+    if feature_config.group in ("E2", "E3"):
         peers = [peer for peer in feature_config.peers if peer != target_symbol]
         if not peers:
             raise DataValidationError(
-                f"Feature group E2 has no peer symbols for target {target_symbol}."
+                f"Feature group E2/E3 has no peer symbols for target {target_symbol}."
             )
         for peer in peers:
             if peer not in snapshots:
-                raise DataValidationError(f"Feature group E2 requires peer snapshot {peer}.")
+                raise DataValidationError(f"Feature group E2/E3 requires peer snapshot {peer}.")
             peer_key = peer.replace(".", "_").replace("=", "_")
             channel = f"peer_{peer_key}_return"
             peer_returns = _return_channel(

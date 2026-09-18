@@ -13,7 +13,7 @@ class ConfigurationError(ValueError):
 
 
 REQUIRED_SYMBOLS = ("ADRO.JK", "PTBA.JK", "ITMG.JK", "IDR=X")
-FEATURE_GROUPS = ("E0", "E1", "E2")
+FEATURE_GROUPS = ("E0", "E1", "E2", "E3")
 DEFAULT_GRU_CANDIDATES = (
     {
         "name": "lookback5_hidden16",
@@ -84,6 +84,19 @@ def _finite_number(value: Any, field: str) -> float:
     if not math.isfinite(result):
         raise ConfigurationError(f"{field} must be a finite number.")
     return result
+
+
+@dataclass(frozen=True)
+class ExpandingFoldConfig:
+    name: str
+    train_end_exclusive: date
+    validation_end_exclusive: date
+
+
+@dataclass(frozen=True)
+class ExternalConfig:
+    usd_idr_symbol: str
+    usd_idr_availability_lag: int
 
 
 @dataclass(frozen=True)
@@ -216,6 +229,8 @@ class AppConfig:
     gru_candidates: tuple[GRUCandidate, ...]
     transformer_candidates: tuple[TransformerCandidate, ...]
     selection_metric: str
+    expanding_folds: tuple[ExpandingFoldConfig, ...] = ()
+    external: ExternalConfig | None = None
 
     @property
     def target_symbols(self) -> tuple[str, ...]:
@@ -512,6 +527,44 @@ def load_config(path: Path) -> AppConfig:
     if len({candidate.name for candidate in all_candidates}) != len(all_candidates):
         raise ConfigurationError("Candidate names must be unique across model families.")
 
+    expanding_raw = raw.get("expanding_folds", [])
+    if expanding_raw is None:
+        expanding_raw = []
+    if not isinstance(expanding_raw, list):
+        raise ConfigurationError("expanding_folds must be a list of tables.")
+    if len(expanding_raw) > 8:
+        raise ConfigurationError("expanding_folds must contain at most 8 folds.")
+    expanding_folds: list[ExpandingFoldConfig] = []
+    for index, item in enumerate(expanding_raw):
+        if not isinstance(item, dict):
+            raise ConfigurationError(f"expanding_folds[{index}] must be a table.")
+        name = item.get("name") or f"fold{index + 1}"
+        if not isinstance(name, str) or not name.strip():
+            raise ConfigurationError(f"expanding_folds[{index}].name must be a non-empty string.")
+        train_end = _date(item.get("train_end_exclusive"), f"expanding_folds[{index}].train_end_exclusive")
+        val_end = _date(item.get("validation_end_exclusive"), f"expanding_folds[{index}].validation_end_exclusive")
+        if not train_end < val_end:
+            raise ConfigurationError(f"expanding_folds[{index}] train_end must be before validation_end.")
+        expanding_folds.append(ExpandingFoldConfig(str(name), train_end, val_end))
+    if len({fold.name for fold in expanding_folds}) != len(expanding_folds):
+        raise ConfigurationError("expanding_folds names must be unique.")
+
+    external: ExternalConfig | None = None
+    external_raw = raw.get("external", {})
+    if not isinstance(external_raw, dict):
+        raise ConfigurationError("external must be a table.")
+    usd_raw = external_raw.get("usd_idr", None)
+    if usd_raw is not None:
+        if not isinstance(usd_raw, dict):
+            raise ConfigurationError("external.usd_idr must be a table.")
+        symbol = str(usd_raw.get("symbol", "IDR=X"))
+        if symbol != "IDR=X":
+            raise ConfigurationError("external.usd_idr.symbol must be IDR=X in this study.")
+        lag = usd_raw.get("availability_lag", availability_lag)
+        if isinstance(lag, bool) or not isinstance(lag, int) or lag < 0:
+            raise ConfigurationError("external.usd_idr.availability_lag must be a non-negative integer.")
+        external = ExternalConfig(symbol, lag)
+
     return AppConfig(
         data=data,
         splits=splits,
@@ -523,4 +576,6 @@ def load_config(path: Path) -> AppConfig:
         gru_candidates=gru_candidates,
         transformer_candidates=transformer_candidates,
         selection_metric=selection_metric,
+        expanding_folds=tuple(expanding_folds),
+        external=external,
     )

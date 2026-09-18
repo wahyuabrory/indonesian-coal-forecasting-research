@@ -1,0 +1,32 @@
+{
+  "symbols": {
+    "ADRO.JK": {
+      "path": "data/yahoo_cache/adro_jk.csv",
+      "source": "Yahoo Finance cached snapshot",
+      "retrieved_at_utc": "2026-09-18T07:58:38.532557+00:00",
+      "rows": 2541,
+      "sha256": "bbe199a37f24f489b7adcd32389c502ec60b6a1184126faa9c2300d63a7b4ca9"
+    },
+    "PTBA.JK": {
+      "path": "data/yahoo_cache/ptba_jk.csv",
+      "source": "Yahoo Finance cached snapshot",
+      "retrieved_at_utc": "2026-09-18T07:58:39.368953+00:00",
+      "rows": 2541,
+      "sha256": "f6deeb3eeb6aa2d0258d5c8451d119030ac505a4a325018607e329cdc01a4b26"
+    },
+    "ITMG.JK": {
+      "path": "data/yahoo_cache/itmg_jk.csv",
+      "source": "Yahoo Finance cached snapshot",
+      "retrieved_at_utc": "2026-09-18T07:58:40.422291+00:00",
+      "rows": 2542,
+      "sha256": "01b9482352ed689debde4d561ba92739d05a1a33fe4b52e934882ecd5084c37d"
+    },
+    "IDR=X": {
+      "path": "data/yahoo_cache/idr_x.csv",
+      "source": "Yahoo Finance cached snapshot",
+      "retrieved_at_utc": "2026-09-18T07:58:41.239144+00:00",
+      "rows": 2687,
+      "sha256": "fa1d3de5eab7ec423f7e238af75f6a57872bdec362b752f1bd33da66eb227d7b"
+    }
+  }
+}

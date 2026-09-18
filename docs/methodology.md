@@ -1,6 +1,6 @@
 # Forecasting methodology
 
-This document is the stable method contract for the baseline and optional GRU and Transformer experiments. The run-specific dates, lags, seed, and candidates live in [`configs/baseline.toml`](../configs/baseline.toml). Verified metrics and risk summaries are in [`results.md`](results.md). See [`literature-review.md`](literature-review.md) for design evidence and [`limitations.md`](limitations.md) for interpretation limits.
+This document is the stable method contract for the baseline and optional GRU and Transformer experiments. The run-specific dates, lags, seed, and candidates live in [`configs/baseline.toml`](../configs/baseline.toml). Research questions and decision rules are in [`research-design.md`](research-design.md); data provenance in [`data.md`](data.md); EDA in [`eda.md`](eda.md); preprocessing in [`preprocessing.md`](preprocessing.md). Verified metrics and risk summaries are in [`results.md`](results.md). See [`literature-review.md`](literature-review.md) for design evidence and [`limitations.md`](limitations.md) for interpretation limits.
 
 ## Data contract
 
@@ -32,7 +32,9 @@ r_t = log(AdjClose[t]) - log(AdjClose[t-1])
 
 `E1` adds the same lagged returns and rolling volatilities for `IDR=X`. Its configured availability lag shifts the exchange-rate observations back before they are aligned to the equity calendar. The default is one source observation. Alignment uses the most recent source date at or before the equity date.
 
-`E2` adds peer-equity lagged returns. The peer availability lag applies the same conservative one-observation rule. The target equity is removed from its own peer list.
+`E2` adds peer-equity lagged returns. The peer availability lag applies the same conservative one-observation rule. The target equity is removed from its own peer list. E2 is exploratory: industry spillover literature motivates testing it, but does not establish it for daily Indonesian coal data.
+
+`E3` combines E1 and E2: own history plus lagged USD/IDR plus lagged peer returns. It answers H3 on combined value. It is also the last group added. A future coal-price feature gets a clean group redesign instead of endless E4 and E5 additions.
 
 Every feature in row `t` is built from information no later than the feature timestamp. The target uses row `t+1` only as the label. No coal feature is present. HBA can be added only after a release-dated input and publication-time rule exist, so this pipeline does not backfill HBA.
 
@@ -46,9 +48,19 @@ The two configured GRU candidates use one GRU layer, lookbacks no longer than 20
 
 The two configured Transformer candidates use one encoder layer, lookbacks no longer than 20, `d_model` no larger than 32, feed-forward widths no larger than 64, valid head divisibility, Adam, at most 100 epochs, validation early stopping, and the restored best validation checkpoint. Each model adds a learned positional embedding before the encoder. The run records candidate parameters, the winning framework version, best epoch, and trainable parameter count. It does not save checkpoints or candidate model dumps.
 
+## Model-input fairness
+
+This is a forecasting-pipeline comparison under a shared information
+horizon, not a pure architecture comparison. Every model family may use
+information from at most the previous 20 trading days: XGBoost via
+engineered lags (1, 2, 3, 5, 10) and rolling windows (5, 20), GRU and
+Transformer via raw return sequences with lookback ≤ 20. Representations
+differ; the horizon does not.
+
 ## Splits and preprocessing
 
-Rows are assigned by date using the configured half-open intervals:
+Single-split rows are assigned by date using the configured half-open
+intervals:
 
 ```text
 train:      [start_inclusive, train_end_exclusive)
@@ -57,6 +69,27 @@ test:       [validation_end_exclusive, test_end_exclusive)
 ```
 
 The test partition remains untouched until the validation winner is fixed. Each partition must meet `splits.min_rows`. The tabular `StandardScaler` is fit on train features only. Validation and test features are transformed with that frozen scaler. For GRU and Transformer candidates, the feature scaler is fit on training sequence values only and the target scaler is fit on training labels only. Validation and test are transform-only. No imputation is performed; incomplete rows or sequences are removed before splitting, and non-finite values fail the data boundary.
+
+## Expanding-window validation
+
+`src/coal_forecasting/validation.py` defines three development folds with an
+expanding training origin at `data.start_inclusive`:
+
+```text
+Fold 1  Train: [2016-01-01, 2020-01-01)  Validate: [2020-01-01, 2021-01-01)
+Fold 2  Train: [2016-01-01, 2021-01-01)  Validate: [2021-01-01, 2022-01-01)
+Fold 3  Train: [2016-01-01, 2022-01-01)  Validate: [2022-01-01, 2023-01-01)
+Final test (untouched): [2023-01-01, 2026-05-01)
+```
+
+Fold dates can be overridden with `[[expanding_folds]]` in the config, but
+every fold must satisfy `train_end <= validation_end <= final-test origin`.
+Each fold refits preprocessing on its own training data, trains, and scores
+validation. Fold metrics are aggregated by mean RMSE per (model, candidate);
+the aggregated winner drives feature, model, and hyperparameter decisions.
+Only then is the frozen final test evaluated once. Fold-level results live
+in `results/fold_metrics.csv`; the ablation summary in
+`results/feature_ablation.csv`.
 
 ## Secondary historical VaR
 
@@ -92,6 +125,6 @@ After selection is frozen, the test partition is evaluated. In `both` mode, both
 
 ## Timestamp and structural-break caveats
 
-The timestamp assumption is explicit: a row dated `t` represents information available after the target equity's daily close, and the next target-equity trading row is the forecast horizon. Same-day external observations are not treated as available for the default E1/E2 run because their availability lags are one source observation.
+The timestamp assumption is explicit: a row dated `t` represents information available after the target equity's daily close, and the next target-equity trading row is the forecast horizon. Same-day external observations are not treated as available for E1, E2, or E3 runs because their availability lags are one source observation.
 
 The ADRO/AADI restructuring and ticker history create a structural break around late 2024. This baseline does not model that event, corporate-action interpretation, or a stable pre/post regime. Results need a separate event-aware treatment before they are used for an economic claim.

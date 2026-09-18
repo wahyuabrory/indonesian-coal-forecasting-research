@@ -20,6 +20,27 @@ usd_idr_availability_lag = 1
 peer_availability_lag = 1
 peers = ["ADRO.JK", "PTBA.JK", "ITMG.JK"]
 
+[external.usd_idr]
+symbol = "IDR=X"
+availability_lag = 1
+
+# Expanding development folds. Train always starts at data.start_inclusive.
+# The final test [validation_end_exclusive, test_end_exclusive) stays untouched.
+[[expanding_folds]]
+name = "fold1"
+train_end_exclusive = "2020-01-01"
+validation_end_exclusive = "2021-01-01"
+
+[[expanding_folds]]
+name = "fold2"
+train_end_exclusive = "2021-01-01"
+validation_end_exclusive = "2022-01-01"
+
+[[expanding_folds]]
+name = "fold3"
+train_end_exclusive = "2022-01-01"
+validation_end_exclusive = "2023-01-01"
+
 [risk]
 confidence = 0.95
 portfolio_value_idr = 1000000

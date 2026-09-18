@@ -22,21 +22,22 @@ The model does not include news, order flow, macroeconomic releases, production 
 
 ## Evaluation design
 
-The runs use one fixed chronological split:
+Development uses three expanding folds (2020, 2021, 2022 validation years)
+with a frozen final test `[2023-01-01, 2026-05-01)`. Each validation year
+has roughly 240 scored rows and the test has 787. Small samples for
+comparing several models. Daily sequence windows can overlap, so row counts
+do not equal independent observations.
 
-- train: `[2016-01-01, 2022-01-01)`;
-- validation: `[2022-01-01, 2023-01-01)`;
-- test: `[2023-01-01, 2026-05-01)`.
-
-This is not multi-fold stability evidence. It does not measure performance across several forecast origins or market regimes. The validation partition has 246 scored rows and the test partition has 787 scored rows in the verified metrics. These are small samples for comparing several models. Daily sequence windows can overlap, so row counts do not equal independent observations.
-
-The runs compare several model families and candidates across nine target/group combinations. This creates multiple opportunities for an isolated low error. The hindsight test-best label in [results.md](results.md) is only a descriptive comparison. It is not a valid selection rule and does not correct for multiple comparisons.
+The runs compare several model families and candidates across twelve target/group combinations (E3 included). This creates multiple opportunities for an isolated low error. The hindsight test-best label in [results.md](results.md) is only a descriptive comparison. It is not a valid selection rule and does not correct for multiple comparisons.
 
 Test metrics remain frozen after validation selection. That protects the reported selection procedure, but one fixed test period is still not enough to support a general performance claim.
 
 ## Model and result interpretation
 
-External features do not improve test RMSE consistently. XGBoost does not beat the naive model on test RMSE in any of the nine comparisons. The small ADRO E1 GRU and PTBA E0 GRU gains are not robust across companies or feature groups. Transformer validation gains do not persist on test.
+External features never beat the naive benchmark by a meaningful margin in
+any of the twelve comparisons. The best delta anywhere is ADRO E1 at
+-0.000008. XGBoost loses everywhere. Transformer validation gains die on
+test. Nothing here holds up across companies or feature groups.
 
 The naive model predicts zero next-day log return. Its low RMSE does not mean that returns are predictable. Directional accuracy and RMSE answer different questions, and neither measures economic value after costs.
 
