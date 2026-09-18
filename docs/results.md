@@ -16,8 +16,8 @@ final test `[2023-01-01, 2026-05-01)` evaluated once, after freezing.
 Requested interval `[2016-01-01, 2026-05-01)`; observed 2016-01-04 to
 2026-04-29 (ADRO/PTBA 2,541 rows, ITMG 2,542). No duplicates, no missing or
 non-finite prices. Returns are near-zero-mean, heavy-tailed (ADRO σ 0.0286,
-PTBA 0.0253, ITMG 0.0250); USD/IDR changes are an order of magnitude calmer
-(σ 0.0065). Lagged external correlations are weak. ADRO shows a late-2024
+PTBA 0.0253, ITMG 0.0250); USD/IDR changes are about 4x calmer
+(σ 0.0065, ratios 3.9 to 4.4). Lagged external correlations are weak. ADRO shows a late-2024
 restructuring regime shift, carried as a limitation. Full detail:
 [`eda.md`](eda.md).
 
@@ -42,7 +42,8 @@ per row.
 | ITMG | E2 | 0.029358 | 0.029314 (depth2_lr005) | 0.029146 (lookback10_hidden32) | **0.029128** (lookback5_d16_heads2_ff32) |
 | ITMG | E3 | 0.029358 | 0.029400 (depth2_lr005) | **0.029102** (lookback10_hidden32) | 0.029157 (lookback5_d16_heads2_ff32) |
 
-GRU wins 10 of 12 groups on folds; XGBoost never beats Naive. Full detail
+GRU wins 10 of 12 groups on folds; XGBoost did not outperform Naive
+consistently. Full detail
 in `results/validation_winners.csv`.
 
 ## 3. Naive baseline
@@ -104,8 +105,9 @@ family.
 Full table in `results/final_test_metrics.csv`: 48 rows, all four families
 for every target and feature group. Each frozen model was refit on
 pre-2023 development data (deep models at their median fold best epoch)
-and scored once on the untouched test. No family beats Naive by a
-meaningful margin anywhere.
+and scored once on the frozen evaluation period. No family outperformed
+Naive; differences were small and not consistent across equities or
+feature groups.
 
 ## 8. Secondary VaR
 

@@ -73,8 +73,8 @@ strategies, GARCH benchmarks, large architectures, dashboards.
   one frozen candidate per family.
 - Frozen models refit on all pre-2023 development data (deep models use the
   median fold best epoch) before the single final-test scoring.
-- The final test (`[2023-01-01, 2026-05-01)`) is evaluated once, after all
-  decisions are frozen. It never influences selection.
+- The frozen evaluation period (`[2023-01-01, 2026-05-01)`) is evaluated
+  once, after all decisions are frozen. It never influences selection.
 - A feature is useful only with repeated evidence: better mean validation
   RMSE across folds and consistent behavior on the final test across
   equities. One favorable run is not enough.

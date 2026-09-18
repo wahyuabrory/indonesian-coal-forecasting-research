@@ -68,7 +68,7 @@ validation: [train_end_exclusive, validation_end_exclusive)
 test:       [validation_end_exclusive, test_end_exclusive)
 ```
 
-The test partition remains untouched until the validation winner is fixed. Each partition must meet `splits.min_rows`. The tabular `StandardScaler` is fit on train features only. Validation and test features are transformed with that frozen scaler. For GRU and Transformer candidates, the feature scaler is fit on training sequence values only and the target scaler is fit on training labels only. Validation and test are transform-only. No imputation is performed; incomplete rows or sequences are removed before splitting, and non-finite values fail the data boundary.
+The frozen evaluation period is not used until the validation winner is fixed. Each partition must meet `splits.min_rows`. The tabular `StandardScaler` is fit on train features only. Validation and test features are transformed with that frozen scaler. For GRU and Transformer candidates, the feature scaler is fit on training sequence values only and the target scaler is fit on training labels only. Validation and test are transform-only. No imputation is performed; incomplete rows or sequences are removed before splitting, and non-finite values fail the data boundary.
 
 ## Expanding-window validation
 
@@ -79,7 +79,7 @@ expanding training origin at `data.start_inclusive`:
 Fold 1  Train: [2016-01-01, 2020-01-01)  Validate: [2020-01-01, 2021-01-01)
 Fold 2  Train: [2016-01-01, 2021-01-01)  Validate: [2021-01-01, 2022-01-01)
 Fold 3  Train: [2016-01-01, 2022-01-01)  Validate: [2022-01-01, 2023-01-01)
-Final test (untouched): [2023-01-01, 2026-05-01)
+Frozen evaluation period: [2023-01-01, 2026-05-01)
 ```
 
 Fold dates can be overridden with `[[expanding_folds]]` in the config, but
@@ -90,13 +90,15 @@ validation. Raw candidate results live in `results/fold_metrics.csv`.
 Selection freezes one candidate per family using mean fold RMSE inside that
 family: one XGBoost, one GRU, one Transformer, plus the Naive benchmark.
 Families never compete on folds. The frozen models are refit on all
-pre-2023 development data, then scored once on the untouched final test, so
+pre-2023 development data, then scored once on the frozen evaluation
+period, so
 `results/final_test_metrics.csv` holds all four families for every target
 and feature group.
 
 XGBoost refits directly on the full development rows. GRU and Transformer
 retrain for the median of their fold best epochs, since no held-out set
-remains inside dev for early stopping and the test must stay untouched.
+remains inside dev for early stopping and the frozen period must stay out
+of training.
 The epoch counts come from folds only. Per-family winners are recorded in
 `results/validation_winners.csv`.
 

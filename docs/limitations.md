@@ -23,14 +23,21 @@ The model does not include news, order flow, macroeconomic releases, production 
 ## Evaluation design
 
 Development uses three expanding folds (2020, 2021, 2022 validation years)
-with a frozen final test `[2023-01-01, 2026-05-01)`. Each validation year
-has roughly 240 scored rows and the test has 787. Small samples for
-comparing several models. Daily sequence windows can overlap, so row counts
-do not equal independent observations.
+with a frozen evaluation period `[2023-01-01, 2026-05-01)`. Each validation
+year has roughly 240 scored rows and the frozen period has 787. Small
+samples for comparing several models. Daily sequence windows can overlap,
+so row counts do not equal independent observations.
+
+The 2023-2026 period was inspected in earlier project iterations before the
+current methodology was finalized, so it is a frozen evaluation period in
+the procedural sense, not a test set no one has ever seen. Treat it as
+honest out-of-sample evidence for the frozen protocol, not as proof
+against all future peeking.
 
 The runs compare several model families and candidates across twelve
 target/group combinations (E3 included), scoring all four families on the
-test. This creates multiple opportunities for an isolated low error. The hindsight test-best label in [results.md](results.md) is only a descriptive comparison. It is not a valid selection rule and does not correct for multiple comparisons.
+frozen period. This creates multiple opportunities for an isolated low
+error and does not correct for multiple comparisons.
 
 Test metrics remain frozen after validation selection. That protects the reported selection procedure, but one fixed test period is still not enough to support a general performance claim.
 
