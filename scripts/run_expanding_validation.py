@@ -345,7 +345,8 @@ def main() -> int:
             winners_frame[["target", "feature_group", "model", "candidate"]],
             on=["target", "feature_group", "model", "candidate"],
         ).query("model != 'zero_return_naive'"
-        ).groupby(["target", "model", "feature_group"], as_index=False)["rmse"].mean()
+        ).groupby(["target", "model", "feature_group", "candidate"],
+                  as_index=False)["rmse"].mean()
     )
     test_means = final_frame[final_frame["model"] != "zero_return_naive"][
         ["target", "model", "feature_group", "candidate", "rmse"]
