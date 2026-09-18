@@ -1,4 +1,4 @@
-# Verified experiment environment (Python 3.11+; run used Python 3.14.5).
+# Verified experiment environment: Python 3.14.5.
 # Install with: pip install -r requirements.lock
 # Deep models (GRU/Transformer) require torch; everything else runs without it.
 matplotlib==3.11.1

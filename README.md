@@ -170,14 +170,6 @@ Yahoo revisions, small daily samples, one market, three equities, the
 ADRO/AADI break, timestamp uncertainty, no causal claims, no trading
 evaluation. Full list in [`docs/limitations.md`](docs/limitations.md).
 
-## Origin
-
-I started from an ADRO GRU closing-price experiment
-(`adro gru haqi.ipynb`, kept local and unchanged). Its honest result was
-that USD/IDR did not automatically help. I rebuilt it as a reproducible
-multi-equity research pipeline with return targets, three equities,
-ablation, and temporal validation.
-
 ## References
 
 [`docs/literature-review.md`](docs/literature-review.md) and
