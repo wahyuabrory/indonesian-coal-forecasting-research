@@ -20,6 +20,7 @@ Usage: python3 scripts/run_expanding_validation.py [--config PATH]
 from __future__ import annotations
 
 import argparse
+import gc
 import hashlib
 import json
 import subprocess
@@ -316,6 +317,8 @@ def main() -> int:
             )
             final_rows.extend(test_rows)
             winner_rows.extend(combo_winners)
+            del combo_folds, test_rows, combo_winners, dataset
+            gc.collect()
             risk = calculate_historical_var(
                 snapshots[target], target, group, "expanding",
                 "per_family", None, config,
