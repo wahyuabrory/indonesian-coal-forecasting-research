@@ -6,15 +6,16 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#000000">
   <meta name="description" content="A leak-aware forecasting study of next-day returns for three Indonesian coal equities, with a negative result kept intact.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; script-src 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'none'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap">
-  <title>Indonesian Coal Forecasting Research</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; script-src 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src data:; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2309090b%22%2F%3E%3Cpath%20d%3D%22M10%2039L20%2032L29%2036L39%2022L54%2017%22%20fill%3D%22none%22%20stroke%3D%22%23f0b85a%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2232%22%20r%3D%223.5%22%20fill%3D%22%23f4f4f5%22%2F%3E%3Ccircle%20cx%3D%2239%22%20cy%3D%2222%22%20r%3D%223.5%22%20fill%3D%22%2363d89b%22%2F%3E%3Cpath%20d%3D%22M11%2049H53%22%20stroke%3D%22%233f3f46%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E">
+  <title>Indonesian Coal Forecasting | Reyza Reyznata</title>
   <style>
     :root {
       --bg: #000;
       --text: #f4f4f5;
       --muted: #a1a1aa;
-      --quiet: #71717a;
+      --quiet: #93939d;
       --axis: #3f3f46;
       --axis-soft: #27272a;
       --good: #63d89b;
@@ -24,8 +25,9 @@
       --paper: #fafafa;
       --ink: #09090b;
       --ease-out: cubic-bezier(.23, 1, .32, 1);
+      --ease-in-out: cubic-bezier(.77, 0, .175, 1);
       --page: min(1180px, calc(100% - 48px));
-      --measure: 68ch;
+      --measure: 66ch;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -37,9 +39,10 @@
       background: var(--bg);
       color: var(--text);
       font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 15px;
-      font-weight: 500;
-      line-height: 1.7;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.68;
+      font-synthesis: none;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
     }
@@ -84,28 +87,8 @@
     .site-nav {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 24px;
-    }
-
-    .site-mark {
-      color: var(--text);
-      font-size: .72rem;
-      font-weight: 800;
-      letter-spacing: .15em;
-      text-decoration: none;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .site-mark::before {
-      content: "";
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      margin-right: 9px;
-      background: var(--caution);
-      vertical-align: 1px;
     }
 
     .nav-links {
@@ -117,38 +100,104 @@
     }
 
     .nav-links a {
+      position: relative;
       color: var(--muted);
       font-size: .76rem;
       font-weight: 700;
-      text-decoration-thickness: 1px;
-      text-underline-offset: 5px;
+      text-decoration: none;
+      transition: color 140ms ease;
     }
 
-    .nav-links a:hover { color: var(--text); }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -6px;
+      height: 1px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: right center;
+      transition: transform 160ms ease;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .nav-links a:hover { color: var(--text); }
+      .nav-links a:hover::after { transform: scaleX(1); transform-origin: left center; }
+    }
 
     section {
       width: var(--page);
       margin: 0 auto;
-      padding: 132px 0 24px;
+      padding: 118px 0 24px;
       scroll-margin-top: 28px;
     }
 
+    #question-shift,
+    #research-questions,
+    #models,
+    #features,
+    #risk,
+    #limitations,
+    #references {
+      padding-top: 88px;
+    }
+
     .hero {
-      min-height: min(900px, 92vh);
       display: grid;
-      align-content: center;
-      padding-top: 112px;
+      align-content: start;
+      padding-top: clamp(56px, 7vw, 88px);
+      padding-bottom: 96px;
     }
 
     .hero-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr);
+      grid-template-columns: minmax(0, 1.08fr) minmax(360px, .92fr);
       gap: clamp(48px, 8vw, 120px);
-      align-items: end;
+      align-items: center;
     }
 
-    .kicker,
-    .section-index,
+    .hero-side {
+      display: grid;
+      gap: 28px;
+      align-self: stretch;
+      align-content: center;
+      min-width: 0;
+    }
+
+    .hero-art {
+      width: 100%;
+      min-height: 280px;
+      display: grid;
+      align-items: center;
+    }
+
+    .hero-art svg {
+      width: 100%;
+      max-height: 330px;
+    }
+
+    .art-grid line { stroke: var(--axis-soft); stroke-width: 1; }
+    .art-zero { stroke: var(--axis); stroke-width: 1.2; stroke-dasharray: 5 7; }
+    .art-freeze { fill: rgba(240, 184, 90, .055); stroke: rgba(240, 184, 90, .26); stroke-width: 1; }
+    .art-label { fill: var(--quiet); font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+    .signal-path { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.2; }
+    .signal-a { stroke: var(--text); opacity: .8; }
+    .signal-b { stroke: var(--caution); opacity: .95; }
+    .signal-c { stroke: var(--good); opacity: .72; }
+    .signal-ghost { fill: none; stroke: var(--axis); stroke-width: 1; stroke-dasharray: 3 7; }
+    .signal-tracer {
+      stroke: var(--bg);
+      stroke-width: 2.5;
+      opacity: 1;
+      filter: drop-shadow(0 0 6px rgba(255,255,255,.5));
+      transform-box: view-box;
+      transform-origin: 0 0;
+    }
+    .tracer-a { fill: var(--text); }
+    .tracer-b { fill: var(--caution); }
+    .tracer-c { fill: var(--good); }
+
     .chart-kicker,
     .micro-label {
       margin: 0;
@@ -161,29 +210,33 @@
     }
 
     .hero h1 {
-      max-width: 13ch;
+      max-width: 15ch;
       margin: 22px 0 28px;
-      font-size: clamp(3rem, 7vw, 6.7rem);
+      font-size: clamp(2.8rem, 5.4vw, 5.1rem);
       font-weight: 700;
-      letter-spacing: -.07em;
-      line-height: .94;
+      letter-spacing: -.065em;
+      line-height: .95;
+      text-wrap: balance;
     }
 
     .hero-question {
-      max-width: 52ch;
+      max-width: 54ch;
       margin: 0;
       color: var(--muted);
       font-size: clamp(1.05rem, 2vw, 1.35rem);
-      line-height: 1.55;
+      line-height: 1.6;
+      text-wrap: pretty;
     }
 
     .hero-result {
-      max-width: 52ch;
+      max-width: 54ch;
       margin: 28px 0 0;
       color: var(--text);
       font-size: clamp(1.15rem, 2.15vw, 1.55rem);
       font-weight: 700;
-      line-height: 1.5;
+      letter-spacing: -.018em;
+      line-height: 1.46;
+      text-wrap: pretty;
     }
 
     .caution-text,
@@ -222,61 +275,92 @@
 
     .verdict {
       align-self: end;
-      padding-bottom: 8px;
+      display: grid;
+      gap: 12px;
+      padding: 0 0 8px;
+    }
+
+    .verdict-row {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+      margin-top: 0;
     }
 
     .verdict-number {
-      display: block;
-      margin: 12px 0 4px;
+      display: inline-flex;
+      align-items: baseline;
+      font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+      gap: .02em;
+      margin: 0;
       color: var(--caution);
-      font-size: clamp(4.5rem, 10vw, 8.5rem);
+      font-size: clamp(4.25rem, 8vw, 7.3rem);
       font-weight: 700;
-      letter-spacing: -.08em;
-      line-height: .9;
+      letter-spacing: -.065em;
+      line-height: .78;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .verdict-number .slash {
+      display: inline-block;
+      transform: translateY(-.015em);
+      margin: 0 -.01em;
+    }
+
+    .verdict-number .digit-three {
+      display: inline-block;
+      transform: translateY(.01em);
     }
 
     .verdict-label {
-      max-width: 28ch;
+      max-width: 25ch;
       margin: 0;
       color: var(--muted);
       font-size: .9rem;
-    }
-
-    .verdict-note {
-      margin: 20px 0 0;
-      color: var(--quiet);
-      font-size: .74rem;
       line-height: 1.55;
     }
 
-    .section-head {
-      display: grid;
-      grid-template-columns: 100px minmax(0, 1fr);
-      gap: 24px;
-      align-items: start;
-      margin-bottom: 56px;
+    .verdict-note {
+      margin: 0;
+      padding-top: 10px;
+      border-top: 1px solid var(--axis-soft);
+      color: var(--quiet);
+      font-size: .76rem;
+      line-height: 1.55;
+      font-variant-numeric: tabular-nums;
     }
 
-    .section-index { padding-top: 11px; }
+    .section-head {
+      display: block;
+      margin-bottom: 48px;
+    }
 
     h2 {
       max-width: 18ch;
       margin: 0;
       font-size: clamp(2rem, 4.5vw, 4rem);
       font-weight: 700;
-      letter-spacing: -.055em;
-      line-height: 1.04;
+      letter-spacing: -.045em;
+      line-height: 1.06;
+      text-wrap: balance;
     }
 
     h3 {
       margin: 0 0 12px;
       font-size: 1rem;
       font-weight: 700;
-      letter-spacing: -.015em;
-      line-height: 1.35;
+      letter-spacing: -.012em;
+      line-height: 1.4;
+      text-wrap: balance;
     }
 
     p { margin: 0; }
+
+    p,
+    li,
+    dd { text-wrap: pretty; }
 
     .lede {
       max-width: 64ch;
@@ -304,7 +388,7 @@
 
     .split {
       display: grid;
-      grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+      grid-template-columns: minmax(0, 1.18fr) minmax(280px, .82fr);
       gap: clamp(48px, 8vw, 112px);
       align-items: start;
     }
@@ -313,7 +397,10 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 36px;
-      margin-top: 10px;
+      max-width: 360px;
+      margin: 6px 0 0 auto;
+      padding-top: 18px;
+      border-top: 1px solid var(--axis-soft);
     }
 
     .context-stat dt {
@@ -372,8 +459,8 @@
     .questions li {
       counter-increment: question;
       color: var(--muted);
-      font-size: .9rem;
-      line-height: 1.65;
+      font-size: .94rem;
+      line-height: 1.7;
     }
 
     .questions li::before {
@@ -381,9 +468,10 @@
       display: block;
       margin-bottom: 16px;
       color: var(--quiet);
-      font-size: .66rem;
-      font-weight: 800;
-      letter-spacing: .13em;
+      font-size: .76rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      font-variant-numeric: tabular-nums;
     }
 
     .dataset-strip {
@@ -431,7 +519,8 @@
     .figure-head p:last-child {
       max-width: 54ch;
       color: var(--muted);
-      font-size: .82rem;
+      font-size: .86rem;
+      line-height: 1.6;
     }
 
     svg {
@@ -450,7 +539,15 @@
     .chart-caution { stroke: var(--caution); fill: var(--caution); }
     .chart-text { fill: var(--muted); font-size: 12px; font-weight: 600; }
     .chart-label { fill: var(--text); font-size: 12px; font-weight: 700; }
-    .chart-small { fill: var(--quiet); font-size: 10px; font-weight: 700; }
+    .chart-small { fill: var(--quiet); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    .chart-bar,
+    .timeline-bar {
+      transform-box: fill-box;
+      transform-origin: left center;
+    }
+
+    .chart-bar.bar-from-right { transform-origin: right center; }
 
     figcaption {
       max-width: 68ch;
@@ -470,8 +567,8 @@
     .controls {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 34px 70px;
-      margin: 0 0 74px 124px;
+      gap: 38px clamp(56px, 7vw, 96px);
+      margin: 0 0 74px;
     }
 
     .controls dt {
@@ -483,8 +580,8 @@
     .controls dd {
       margin: 7px 0 0;
       color: var(--muted);
-      font-size: .84rem;
-      line-height: 1.65;
+      font-size: .88rem;
+      line-height: 1.7;
     }
 
     .timeline-wrap,
@@ -500,7 +597,7 @@
     .result-chart-wrap svg { min-width: 720px; }
     .flip-chart-wrap svg { min-width: 620px; }
 
-    .timeline-figure { margin-left: 124px; }
+    .timeline-figure { margin-left: 0; }
 
     .model-list {
       display: grid;
@@ -538,24 +635,24 @@
     .model-name::before {
       content: "0" counter(model) "  ";
       color: var(--quiet);
-      font-size: .65rem;
-      letter-spacing: .12em;
+      font-size: .74rem;
+      letter-spacing: .07em;
+      font-variant-numeric: tabular-nums;
       vertical-align: .2em;
     }
 
     .model-list p {
       color: var(--muted);
-      font-size: .82rem;
-      line-height: 1.65;
+      font-size: .87rem;
+      line-height: 1.7;
     }
 
-    .ladder-question {
-      max-width: 37ch;
-      margin: 66px 0 0 25%;
-      font-size: clamp(1.55rem, 3vw, 2.6rem);
-      font-weight: 700;
-      letter-spacing: -.045em;
-      line-height: 1.25;
+    .section-lede {
+      max-width: 66ch;
+      margin: -10px 0 44px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
     }
 
     .feature-list {
@@ -578,8 +675,8 @@
     .feature-list dd {
       margin: 14px 0 0;
       color: var(--muted);
-      font-size: .84rem;
-      line-height: 1.65;
+      font-size: .88rem;
+      line-height: 1.7;
     }
 
     .feature-list dd span {
@@ -594,33 +691,35 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 60px;
-      margin: 68px 0 0 25%;
+      margin: 60px 0 0;
     }
 
     .feature-rationale p {
       color: var(--muted);
-      font-size: .86rem;
+      font-size: .9rem;
+      line-height: 1.7;
     }
 
-    .feature-rule {
-      max-width: 49ch;
-      margin: 50px 0 0 25%;
-      color: var(--text);
-      font-size: 1.15rem;
-      font-weight: 700;
-      line-height: 1.55;
+    .feature-note {
+      max-width: 66ch;
+      margin: 42px 0 0;
+      color: var(--muted);
+      font-size: .95rem;
+      line-height: 1.75;
     }
 
     .results-intro {
       max-width: 47ch;
-      margin: 0 0 74px 124px;
+      margin: 0 0 74px;
       font-size: clamp(1.4rem, 3vw, 2.55rem);
       font-weight: 700;
       letter-spacing: -.04em;
       line-height: 1.35;
     }
 
-    .result-figure { margin-left: 124px; }
+    .result-figure { margin-left: 0; }
+
+    .mobile-model-results { display: none; }
 
     .legend {
       display: flex;
@@ -663,9 +762,9 @@
     th {
       padding: 0 20px 0 0;
       color: var(--quiet);
-      font-size: .65rem;
-      font-weight: 800;
-      letter-spacing: .09em;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .07em;
       text-transform: uppercase;
       white-space: nowrap;
     }
@@ -690,8 +789,20 @@
       display: grid;
       grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
       gap: clamp(52px, 7vw, 96px);
-      margin: 110px 0 0 124px;
+      margin: 110px 0 0;
       align-items: start;
+    }
+
+    .feature-result > *,
+    .result-figure,
+    .timeline-figure,
+    .eda-grid > *,
+    .risk-layout > *,
+    .table-wrap,
+    .result-chart-wrap,
+    .flip-chart-wrap {
+      min-width: 0;
+      max-width: 100%;
     }
 
     .feature-result-copy .lede { color: var(--text); }
@@ -729,39 +840,60 @@
       margin-top: 12px;
     }
 
+    details[open] p {
+      animation: details-enter 180ms var(--ease-out);
+    }
+
+    @keyframes details-enter {
+      from { opacity: .35; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .reflection {
-      max-width: 1030px;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: center;
+      max-width: none;
+      text-align: left;
     }
 
-    .reflection .section-head {
-      grid-template-columns: 1fr;
-      justify-items: center;
+    .reflection-layout {
+      display: grid;
+      grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr);
+      gap: clamp(48px, 8vw, 118px);
+      align-items: start;
+      padding-top: 34px;
+      border-top: 1px solid var(--axis-soft);
     }
-
-    .reflection .section-index { padding: 0; }
-    .reflection h2 { max-width: 17ch; }
 
     .reflection-evidence {
-      margin: 0 auto 44px;
+      margin: 0;
       color: var(--muted);
-      font-size: 1rem;
+      font-size: .9rem;
+      line-height: 1.7;
     }
 
     .reflection-evidence strong {
+      display: block;
+      font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+      margin-bottom: 12px;
       color: var(--text);
-      font-size: 1.3em;
+      font-size: clamp(2.7rem, 5vw, 4.7rem);
+      line-height: .95;
+      letter-spacing: -.055em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .reflection-copy h2 {
+      max-width: 18ch;
+      margin-bottom: 26px;
     }
 
     .reflection-statement {
-      margin: 0 auto;
-      max-width: 28ch;
-      font-size: clamp(2rem, 5.5vw, 5.1rem);
-      font-weight: 700;
-      letter-spacing: -.06em;
-      line-height: 1.1;
+      max-width: 42ch;
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(1.35rem, 2.5vw, 2.3rem);
+      font-weight: 650;
+      letter-spacing: -.035em;
+      line-height: 1.34;
     }
 
     .risk-layout {
@@ -812,21 +944,14 @@
 
     .limit-item p {
       color: var(--muted);
-      font-size: .86rem;
+      font-size: .9rem;
+      line-height: 1.7;
     }
 
     .next-tests {
-      display: grid;
-      grid-template-columns: 100px minmax(0, 1fr);
-      gap: 24px;
-      margin-top: 72px;
-    }
-
-    .next-tests h3 {
-      color: var(--quiet);
-      font-size: .69rem;
-      letter-spacing: .13em;
-      text-transform: uppercase;
+      margin-top: 64px;
+      padding-top: 30px;
+      border-top: 1px solid var(--axis-soft);
     }
 
     .next-tests ul {
@@ -852,7 +977,7 @@
 
     .reference-intro {
       max-width: 66ch;
-      margin: 0 0 46px 124px;
+      margin: 0 0 46px;
       color: var(--muted);
     }
 
@@ -860,7 +985,7 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 22px 70px;
-      margin: 0 0 0 124px;
+      margin: 0;
       padding: 0;
       list-style: none;
       counter-reset: ref;
@@ -893,15 +1018,14 @@
     }
 
     .repository {
-      min-height: 74vh;
+      min-height: 0;
       display: grid;
-      align-content: center;
+      align-content: start;
       justify-items: center;
       text-align: center;
-      padding-bottom: 110px;
+      padding-top: 92px;
+      padding-bottom: 64px;
     }
-
-    .repository .section-index { margin-bottom: 24px; }
     .repository h2 { max-width: 15ch; }
 
     .repository-copy {
@@ -914,44 +1038,193 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 10px;
       min-height: 44px;
       margin-top: 38px;
       padding: 11px 17px;
       border-radius: 6px;
       background: linear-gradient(to bottom, #fff, #dadadd);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), 0 2px 0 #8f8f94;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .88), 0 2px 0 #8f8f94, 0 8px 22px rgba(0, 0, 0, .18);
       color: var(--ink);
       font-size: .82rem;
       font-weight: 800;
       text-decoration: none;
-      transition: transform 140ms var(--ease-out), box-shadow 140ms var(--ease-out);
+      will-change: transform;
+      transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
     }
 
     .repo-link:active {
-      transform: scale(.97);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .75), 0 1px 0 #8f8f94;
+      transform: translateY(1px) scale(.985);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .72), 0 1px 0 #8f8f94, 0 3px 10px rgba(0, 0, 0, .14);
+      filter: brightness(.97);
+    }
+    .repo-link svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      transition: transform 160ms ease;
     }
 
     .repo-link span {
-      margin-left: 18px;
-      font-size: 1rem;
+      display: inline-block;
     }
 
     footer {
       width: var(--page);
       margin: 0 auto;
-      padding: 0 0 30px;
+      padding: 0 0 24px;
       color: var(--quiet);
       font-size: .68rem;
       text-align: center;
     }
 
     @media (hover: hover) and (pointer: fine) {
-      .repo-link:hover { transform: translateY(-2px); }
+      .repo-link:hover {
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 2px 0 #8f8f94, 0 12px 30px rgba(0, 0, 0, .22);
+      }
+      .repo-link:hover svg { transform: translateX(-1px) scale(1.06); }
     }
 
     @media (prefers-reduced-motion: no-preference) {
       html { scroll-behavior: smooth; }
+
+      .hero h1,
+      .hero-question,
+      .hero-result,
+      .hero .metadata,
+      .hero .hero-art,
+      .hero .verdict {
+        opacity: 0;
+        transform: translateY(8px);
+        animation: narrative-enter 600ms var(--ease-out) forwards;
+      }
+
+      .hero h1 { animation-delay: 20ms; }
+      .hero-question { animation-delay: 80ms; }
+      .hero-result { animation-delay: 140ms; }
+      .hero .metadata { animation-delay: 200ms; }
+      .hero .hero-art { animation-delay: 80ms; }
+      .hero .verdict { animation-delay: 200ms; }
+
+      .motion-ready [data-reveal] {
+        opacity: 0;
+        transform: translateY(8px);
+        transition:
+          opacity 500ms var(--ease-out) var(--reveal-delay, 0ms),
+          transform 500ms var(--ease-out) var(--reveal-delay, 0ms);
+      }
+
+      .motion-ready [data-reveal][data-visible="true"] {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .motion-ready .shift-arrow[data-reveal] { transform: translateX(-8px); }
+      .motion-ready .shift-arrow[data-reveal][data-visible="true"] { transform: translateX(0); }
+
+      .motion-ready svg[data-chart-animate] {
+        opacity: .72;
+        transition: opacity 260ms var(--ease-out);
+      }
+
+      .motion-ready svg[data-chart-animate][data-visible="true"] {
+        opacity: 1;
+      }
+
+      .motion-ready svg[data-chart-animate] .chart-bar {
+        opacity: 0;
+        clip-path: inset(0 100% 0 0);
+        transition:
+          opacity 180ms ease var(--chart-delay, 80ms),
+          clip-path 620ms var(--ease-out) var(--chart-delay, 80ms);
+      }
+
+      .motion-ready svg[data-chart-animate] .chart-bar.bar-from-right {
+        clip-path: inset(0 0 0 100%);
+      }
+
+      .motion-ready svg[data-chart-animate] .timeline-bar {
+        opacity: 0;
+        clip-path: inset(0 100% 0 0);
+        transition:
+          opacity 180ms ease var(--chart-delay, 80ms),
+          clip-path 620ms var(--ease-out) var(--chart-delay, 80ms);
+      }
+
+      .motion-ready svg[data-chart-animate] .chart-line-motion {
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: left center;
+        transform: scaleX(.92);
+        transition:
+          opacity 180ms ease var(--chart-delay, 80ms),
+          transform 520ms var(--ease-out) var(--chart-delay, 80ms);
+      }
+
+      .motion-ready svg[data-chart-animate] .chart-point-motion {
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+        transform: scale(.92);
+        transition:
+          opacity 180ms ease var(--chart-delay, 80ms),
+          transform 300ms var(--ease-out) var(--chart-delay, 80ms);
+      }
+
+      .motion-ready svg[data-chart-animate][data-visible="true"] .chart-bar,
+      .motion-ready svg[data-chart-animate][data-visible="true"] .timeline-bar {
+        opacity: 1;
+        clip-path: inset(0);
+      }
+
+      .motion-ready svg[data-chart-animate][data-visible="true"] .chart-line-motion,
+      .motion-ready svg[data-chart-animate][data-visible="true"] .chart-point-motion {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .hero-art .signal-path {
+        stroke-dasharray: 540;
+        stroke-dashoffset: 540;
+        animation: signal-draw 900ms var(--ease-out) 120ms forwards, signal-breathe 6s ease-in-out 1.15s infinite;
+      }
+
+      .hero-art .signal-ghost {
+        animation: ghost-drift 8s linear 1.2s infinite;
+      }
+
+      .hero-art .art-freeze {
+        transform-origin: center;
+        animation: freeze-pulse 4.2s ease-in-out 1s infinite;
+      }
+
+      @keyframes signal-draw {
+        to { stroke-dashoffset: 0; }
+      }
+
+      @keyframes signal-breathe {
+        0%, 100% { opacity: .82; }
+        50% { opacity: 1; }
+      }
+
+      @keyframes ghost-drift {
+        0% { stroke-dashoffset: 0; opacity: .5; }
+        50% { opacity: .72; }
+        100% { stroke-dashoffset: -48; opacity: .5; }
+      }
+
+      @keyframes freeze-pulse {
+        0%, 100% { fill: rgba(240, 184, 90, .055); stroke: rgba(240, 184, 90, .26); }
+        50% { fill: rgba(240, 184, 90, .09); stroke: rgba(240, 184, 90, .38); }
+      }
+
+      @keyframes narrative-enter {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
     }
 
     @media (max-width: 900px) {
@@ -960,20 +1233,22 @@
       section { padding-top: 105px; }
 
       .hero {
-        min-height: auto;
-        padding-top: 130px;
+        padding-top: 64px;
+        padding-bottom: 80px;
       }
 
       .hero-layout,
       .split,
       .risk-layout,
-      .feature-result {
+      .feature-result,
+      .reflection-layout {
         grid-template-columns: 1fr;
       }
 
-      .verdict { margin-top: 32px; }
-
-      .section-head { grid-template-columns: 74px minmax(0, 1fr); }
+      .hero-side { margin-top: 18px; }
+      .hero-art { min-height: 240px; max-width: 620px; }
+      .verdict { margin-top: 4px; max-width: 560px; }
+      .context-stat { margin: 28px 0 0; max-width: 520px; }
 
       .questions {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -999,32 +1274,34 @@
       .feature-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .model-list li:nth-child(2)::after { display: none; }
 
-      .feature-rationale,
-      .feature-rule,
-      .ladder-question { margin-left: 0; }
-
+      .feature-rationale { margin-left: 0; }
       .references { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 640px) {
       :root { --page: calc(100% - 28px); }
 
-      body { font-size: 14px; }
+      body { font-size: 15px; }
 
       .site-header { padding-top: 18px; }
       .nav-links li:nth-child(2) { display: none; }
       .nav-links { gap: 15px; }
 
-      .hero h1 { letter-spacing: -.06em; }
-      .hero-result { font-size: 1.05rem; }
-
-      .section-head {
-        grid-template-columns: 1fr;
-        gap: 14px;
-        margin-bottom: 42px;
+      .hero h1 {
+        font-size: clamp(2.55rem, 10.8vw, 2.95rem);
+        letter-spacing: -.05em;
+        line-height: .98;
       }
 
-      .section-index { padding: 0; }
+      .hero-question { line-height: 1.62; }
+      .hero-result { font-size: 1.08rem; }
+      .hero-art { min-height: 210px; }
+      .verdict-row { grid-template-columns: max-content 1fr; gap: 14px; align-items: center; }
+      .verdict-number { font-size: 4.4rem; }
+      .verdict-label { font-size: .82rem; }
+      .verdict-note { font-size: .72rem; }
+
+      .section-head { margin-bottom: 38px; }
 
       .context-stat,
       .eda-grid,
@@ -1053,7 +1330,6 @@
       .model-list,
       .feature-list { grid-template-columns: 1fr; }
       .model-list li::after { display: none; }
-
       .model-list li:not(:last-child) { padding-bottom: 20px; }
 
       .feature-rationale { gap: 24px; }
@@ -1061,15 +1337,53 @@
       .results-intro { margin-bottom: 52px; }
       .feature-result { margin-top: 78px; }
 
-      .risk-values { grid-template-columns: 1fr; }
+      .result-chart-wrap,
+      .result-figure > .legend { display: none; }
 
-      .next-tests {
-        grid-template-columns: 1fr;
-        gap: 14px;
+      .mobile-model-results {
+        display: grid;
+        gap: 28px;
+        margin-top: 10px;
       }
 
+      .mobile-result-group {
+        padding-top: 18px;
+        border-top: 1px solid var(--axis-soft);
+      }
+
+      .mobile-result-group h4 {
+        margin: 0 0 13px;
+        color: var(--text);
+        font-size: .82rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+      }
+
+      .mobile-result-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+        padding: 7px 0;
+        color: var(--muted);
+        font-size: .8rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .mobile-result-row strong {
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      .mobile-result-row .better { color: var(--good); }
+      .mobile-result-row .worse { color: var(--caution); }
+
+      .reflection-layout { gap: 34px; }
+      .reflection-evidence strong { font-size: 3.2rem; }
+      .reflection-statement { font-size: 1.35rem; }
+
+      .risk-values { grid-template-columns: 1fr; }
       .references li { padding-left: 36px; }
-      .repository { min-height: 68vh; }
+      .repository { padding-top: 76px; padding-bottom: 54px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1077,6 +1391,37 @@
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
       }
+
+      .hero h1,
+      .hero-question,
+      .hero-result,
+      .hero .metadata,
+      .hero .hero-art,
+      .hero .verdict,
+      .motion-ready [data-reveal] {
+        opacity: 1;
+        transform: none;
+        animation: none;
+      }
+
+      .motion-ready svg[data-chart-animate],
+      .motion-ready svg[data-chart-animate] .chart-bar,
+      .motion-ready svg[data-chart-animate] .timeline-bar,
+      .motion-ready svg[data-chart-animate] .chart-line-motion,
+      .motion-ready svg[data-chart-animate] .chart-point-motion {
+        opacity: 1;
+        transform: none;
+        clip-path: none;
+        transition: none;
+      }
+
+      .hero-art .signal-path,
+      .hero-art .signal-ghost,
+      .hero-art .art-freeze { animation: none; stroke-dashoffset: 0; opacity: 1; transform: none; }
+
+      .hero-art .signal-tracer { opacity: 1; }
+
+      details[open] p { animation: none; }
 
       .repo-link:hover,
       .repo-link:active { transform: none; }
@@ -1088,7 +1433,6 @@
 
   <header class="site-header">
     <nav class="site-nav" aria-label="Case study navigation">
-      <a class="site-mark" href="#overview">ICFR / 2026</a>
       <ul class="nav-links">
         <li><a href="#data">Data</a></li>
         <li><a href="#experiment-design">Experiment</a></li>
@@ -1102,10 +1446,9 @@
     <section class="hero" id="overview" aria-labelledby="hero-title">
       <div class="hero-layout">
         <div>
-          <p class="kicker">01 / Outcome · Independent forecasting study</p>
           <h1 id="hero-title">Indonesian Coal Forecasting Research</h1>
           <p class="hero-question">Do external market signals and more complex models improve next-day return forecasts for Indonesian coal equities?</p>
-          <p class="hero-result">Across ADRO, PTBA, and ITMG, <span class="caution-text">neither added external variables nor higher model complexity produced a consistent out-of-sample advantage</span> over a zero-return baseline.</p>
+          <p class="hero-result">Across ADRO, PTBA, and ITMG, <span class="caution-text">neither added external variables nor higher model complexity produced a consistent advantage during the frozen evaluation period</span> over a zero-return baseline.</p>
           <ul class="metadata" aria-label="Project metadata">
             <li>Independent research</li>
             <li>Time-series forecasting</li>
@@ -1113,21 +1456,63 @@
             <li>Python / PyTorch / XGBoost</li>
           </ul>
         </div>
-        <aside class="verdict" aria-label="Main result summary">
-          <p class="micro-label">Repeatable E0 wins</p>
-          <strong class="verdict-number">0/3</strong>
-          <p class="verdict-label">complex model families beat the naive baseline across all three equities.</p>
-          <p class="verdict-note">Frozen evaluation period<br>[2023-01-01, 2026-05-01)</p>
-        </aside>
+        <div class="hero-side">
+          <div class="hero-art" aria-hidden="true">
+            <svg viewBox="0 0 520 330">
+              <g class="art-grid">
+                <line x1="32" y1="58" x2="492" y2="58"/>
+                <line x1="32" y1="114" x2="492" y2="114"/>
+                <line x1="32" y1="170" x2="492" y2="170"/>
+                <line x1="32" y1="226" x2="492" y2="226"/>
+                <line x1="32" y1="282" x2="492" y2="282"/>
+                <line x1="96" y1="34" x2="96" y2="294"/>
+                <line x1="176" y1="34" x2="176" y2="294"/>
+                <line x1="256" y1="34" x2="256" y2="294"/>
+                <line x1="336" y1="34" x2="336" y2="294"/>
+                <line x1="416" y1="34" x2="416" y2="294"/>
+              </g>
+              <rect class="art-freeze" x="355" y="34" width="137" height="260" rx="6"/>
+              <line class="art-zero" x1="32" y1="170" x2="492" y2="170"/>
+              <path class="signal-ghost" d="M32 201 C72 168 94 215 132 177 S198 125 232 157 S294 210 330 173 S394 142 432 179 S468 166 492 171"/>
+              <path id="signal-path-a" class="signal-path signal-a" d="M32 176 C68 151 88 190 122 169 S178 146 211 178 S267 196 302 164 S358 153 391 174 S446 186 492 166"/>
+              <path id="signal-path-b" class="signal-path signal-b" d="M32 151 C69 188 92 126 128 156 S187 190 218 161 S275 120 310 153 S368 198 405 164 S456 139 492 157"/>
+              <path id="signal-path-c" class="signal-path signal-c" d="M32 188 C72 209 101 160 137 181 S191 213 226 174 S282 149 317 179 S375 189 412 167 S455 180 492 173"/>
+              <g transform="translate(380 166.801)">
+                <circle class="signal-tracer tracer-a" data-wave="signal-path-a" data-stop-x="380" data-stop-y="166.801" cx="0" cy="0" r="5.2"/>
+              </g>
+              <g transform="translate(420 151.664)">
+                <circle class="signal-tracer tracer-b" data-wave="signal-path-b" data-stop-x="420" data-stop-y="151.664" cx="0" cy="0" r="5.2"/>
+              </g>
+              <g transform="translate(460 168.290)">
+                <circle class="signal-tracer tracer-c" data-wave="signal-path-c" data-stop-x="460" data-stop-y="168.290" cx="0" cy="0" r="5.2"/>
+              </g>
+              <text class="art-label" x="32" y="316">DEVELOPMENT</text>
+              <text class="art-label" x="374" y="316">FROZEN PERIOD</text>
+            </svg>
+          </div>
+          <aside class="verdict" aria-label="Main result summary">
+            <p class="micro-label">Consistent complex-model wins</p>
+            <div class="verdict-row">
+              <strong class="verdict-number"><span class="digit-zero">0</span><span class="slash">/</span><span class="digit-three">3</span></strong>
+              <p class="verdict-label">complex model families beat the naive baseline across all three equities.</p>
+            </div>
+            <p class="verdict-note">Own-history comparison · Frozen period [2023-01-01, 2026-05-01)</p>
+          </aside>
+        </div>
       </div>
     </section>
 
     <section id="motivation" aria-labelledby="motivation-title">
       <div class="section-head">
-        <p class="section-index">02 / Why</p>
         <h2 id="motivation-title">Why I investigated this</h2>
       </div>
       <div class="split">
+        <div class="motivation-copy">
+          <p class="body-copy">I started with a broader curiosity about Indonesian financial markets. Coal gave me a constrained test case. Several large listed companies share a sector, while market conditions outside their own price histories can affect them.</p>
+          <p class="body-copy">In 2025, Indonesia produced 790 million tonnes of coal and exported 514 million tonnes, or 65.1% of output, according to the Ministry of Energy and Mineral Resources <a class="citation" href="#ref-13" aria-label="Reference 13">[13]</a>. That export exposure made coal a useful setting for asking whether external market information appears in listed-equity returns.</p>
+          <p class="body-copy">That made a practical question possible. If these companies share external pressures, should movements in USD/IDR or peer coal equities help forecast their next trading-day returns?</p>
+          <p class="body-copy">Prior Indonesian studies made exchange-rate exposure reasonable to test <a class="citation" href="#ref-1" aria-label="Reference 1">[1]</a> <a class="citation" href="#ref-2" aria-label="Reference 2">[2]</a>. They did not prove that the variables would improve prediction.</p>
+        </div>
         <dl class="context-stat" aria-label="Study context">
           <div>
             <dt>Equities</dt>
@@ -1138,17 +1523,11 @@
             <dd>USD/IDR</dd>
           </div>
         </dl>
-        <div>
-          <p class="body-copy">I started with a broader curiosity about Indonesian financial markets. Coal gave me a constrained test case. Several large listed companies share a sector, while market conditions outside their own price histories can affect them.</p>
-          <p class="body-copy">That made a practical question possible. If these companies share external pressures, should movements in USD/IDR or peer coal equities help forecast their next trading-day returns?</p>
-          <p class="body-copy">Prior Indonesian studies made exchange-rate exposure reasonable to test <a class="citation" href="#ref-1" aria-label="Reference 1">[1]</a> <a class="citation" href="#ref-2" aria-label="Reference 2">[2]</a>. They did not prove that the variables would improve prediction.</p>
-        </div>
       </div>
     </section>
 
     <section id="question-shift" aria-labelledby="shift-title">
       <div class="section-head">
-        <p class="section-index">03 / Shift</p>
         <h2 id="shift-title">The question became harder</h2>
       </div>
       <p class="lede">My first version was narrower: one stock, a GRU, and USD/IDR as an external signal. When that signal did not clearly help, the assumption behind the model became more interesting than tuning the model.</p>
@@ -1167,7 +1546,6 @@
 
     <section id="research-questions" aria-labelledby="questions-title">
       <div class="section-head">
-        <p class="section-index">04 / Questions</p>
         <h2 id="questions-title">Questions worth testing</h2>
       </div>
       <ol class="questions">
@@ -1181,7 +1559,6 @@
 
     <section id="data" aria-labelledby="data-title">
       <div class="section-head">
-        <p class="section-index">05 / Data</p>
         <h2 id="data-title">What the data looked like</h2>
       </div>
 
@@ -1259,15 +1636,15 @@
             <text class="chart-small" x="642" y="222">8</text>
 
             <text class="chart-label" x="0" y="54">ADRO</text>
-            <rect class="chart-caution" x="94" y="40" width="518" height="15" rx="2" />
+            <rect class="chart-bar chart-caution" x="94" y="40" width="518" height="15" rx="2" />
             <text class="chart-label" x="620" y="53">7.45</text>
 
             <text class="chart-label" x="0" y="114">PTBA</text>
-            <rect class="chart-caution" x="94" y="100" width="542" height="15" rx="2" />
+            <rect class="chart-bar chart-caution" x="94" y="100" width="542" height="15" rx="2" />
             <text class="chart-label" x="644" y="113">7.80</text>
 
             <text class="chart-label" x="0" y="174">ITMG</text>
-            <rect class="chart-caution" x="94" y="160" width="256" height="15" rx="2" />
+            <rect class="chart-bar chart-caution" x="94" y="160" width="256" height="15" rx="2" />
             <text class="chart-label" x="358" y="173">3.69</text>
           </svg>
           <figcaption>A Jarque-Bera test rejects normality for all three series. Rolling volatility also changes through time, so the feature set records 5-day and 20-day volatility.</figcaption>
@@ -1279,7 +1656,6 @@
 
     <section id="experiment-design" aria-labelledby="design-title">
       <div class="section-head">
-        <p class="section-index">06 / Controls</p>
         <h2 id="design-title">Designing a result I could defend</h2>
       </div>
 
@@ -1336,24 +1712,24 @@
             <line class="chart-axis" x1="160" y1="48" x2="842" y2="48" />
 
             <text class="chart-label" x="0" y="91">Fold 1</text>
-            <rect class="chart-muted-fill" x="160" y="76" width="268" height="16" rx="2" />
-            <rect class="chart-good" x="428" y="76" width="67" height="16" rx="2" />
+            <rect class="timeline-bar chart-muted-fill" x="160" y="76" width="268" height="16" rx="2" />
+            <rect class="timeline-bar chart-good" x="428" y="76" width="67" height="16" rx="2" />
             <text class="chart-small" x="171" y="70">train</text>
             <text class="chart-small" x="434" y="70">validate 2020</text>
 
             <text class="chart-label" x="0" y="143">Fold 2</text>
-            <rect class="chart-muted-fill" x="160" y="128" width="335" height="16" rx="2" />
-            <rect class="chart-good" x="495" y="128" width="67" height="16" rx="2" />
+            <rect class="timeline-bar chart-muted-fill" x="160" y="128" width="335" height="16" rx="2" />
+            <rect class="timeline-bar chart-good" x="495" y="128" width="67" height="16" rx="2" />
             <text class="chart-small" x="501" y="122">validate 2021</text>
 
             <text class="chart-label" x="0" y="195">Fold 3</text>
-            <rect class="chart-muted-fill" x="160" y="180" width="402" height="16" rx="2" />
-            <rect class="chart-good" x="562" y="180" width="67" height="16" rx="2" />
+            <rect class="timeline-bar chart-muted-fill" x="160" y="180" width="402" height="16" rx="2" />
+            <rect class="timeline-bar chart-good" x="562" y="180" width="67" height="16" rx="2" />
             <text class="chart-small" x="568" y="174">validate 2022</text>
 
             <text class="chart-label" x="0" y="247">Frozen</text>
             <line class="chart-guide" x1="629" y1="54" x2="629" y2="270" />
-            <rect class="chart-caution" x="629" y="232" width="213" height="16" rx="2" />
+            <rect class="timeline-bar chart-caution" x="629" y="232" width="213" height="16" rx="2" />
             <text class="chart-small" x="640" y="224">evaluate 2023 to 2026</text>
             <text class="chart-label" x="160" y="292">select on folds</text>
             <text class="chart-label" x="629" y="292">freeze decisions</text>
@@ -1365,9 +1741,9 @@
 
     <section id="models" aria-labelledby="models-title">
       <div class="section-head">
-        <p class="section-index">07 / Complexity</p>
         <h2 id="models-title">Testing complexity</h2>
       </div>
+      <p class="section-lede">This model ladder tests whether each increase in complexity produces a repeatable reduction in forecast error.</p>
       <ol class="model-list">
         <li>
           <span class="model-name">Zero-return baseline</span>
@@ -1386,12 +1762,10 @@
           <p>Tests extra sequence-model complexity, with counterevidence in view <a class="citation" href="#ref-11" aria-label="Reference 11">[11]</a> <a class="citation" href="#ref-12" aria-label="Reference 12">[12]</a>.</p>
         </li>
       </ol>
-      <p class="ladder-question">Does each extra level of complexity earn its cost with repeatable improvement?</p>
     </section>
 
     <section id="features" aria-labelledby="features-title">
       <div class="section-head">
-        <p class="section-index">08 / Information</p>
         <h2 id="features-title">Testing information</h2>
       </div>
       <dl class="feature-list">
@@ -1416,12 +1790,11 @@
         <p>E1 follows Indonesian evidence on exchange-rate exposure <a class="citation" href="#ref-1" aria-label="Reference 1">[1]</a> <a class="citation" href="#ref-2" aria-label="Reference 2">[2]</a>.</p>
         <p>E2 is exploratory. Industry information diffusion makes peer returns plausible, but the source evidence is monthly US data, not daily Indonesian coal data <a class="citation" href="#ref-3" aria-label="Reference 3">[3]</a> <a class="citation" href="#ref-4" aria-label="Reference 4">[4]</a> <a class="citation" href="#ref-5" aria-label="Reference 5">[5]</a>.</p>
       </div>
-      <p class="feature-rule">I did not add indicators or external variables simply because they were available. Each group needed a reason to exist.</p>
+      <p class="feature-note">I limited the external features to two ideas with a clear research rationale: exchange-rate exposure and peer-market information. The ablation tests whether either one actually improves forecasting.</p>
     </section>
 
     <section id="results" aria-labelledby="results-title">
       <div class="section-head">
-        <p class="section-index">09 / Evidence</p>
         <h2 id="results-title">What survived evaluation</h2>
       </div>
       <p class="results-intro">Some complex models produced small improvements on individual equities. <span class="caution-text">Those gains did not repeat consistently</span> across stocks or feature groups.</p>
@@ -1447,39 +1820,61 @@
 
             <text class="chart-label" x="0" y="61">ADRO</text>
             <text class="chart-text" x="0" y="91">XGBoost</text>
-            <rect class="chart-caution" x="180" y="81" width="567" height="7" />
+            <rect class="chart-bar chart-caution" x="180" y="81" width="567" height="9" rx="3" />
             <text class="chart-label" x="757" y="91">+2.182%</text>
             <text class="chart-text" x="0" y="121">GRU</text>
-            <rect class="chart-good" x="175" y="111" width="5" height="7" />
+            <rect class="chart-bar chart-good bar-from-right" x="175" y="111" width="5" height="9" rx="3" />
             <circle class="chart-good" cx="175" cy="114.5" r="5" />
             <text class="chart-label" x="92" y="121">-0.018%</text>
             <text class="chart-text" x="0" y="151">Transformer</text>
-            <rect class="chart-caution" x="180" y="141" width="164" height="7" />
+            <rect class="chart-bar chart-caution" x="180" y="141" width="164" height="9" rx="3" />
             <text class="chart-label" x="354" y="151">+0.631%</text>
 
             <text class="chart-label" x="0" y="216">PTBA</text>
             <text class="chart-text" x="0" y="246">XGBoost</text>
-            <rect class="chart-caution" x="180" y="236" width="564" height="7" />
+            <rect class="chart-bar chart-caution" x="180" y="236" width="564" height="9" rx="3" />
             <text class="chart-label" x="754" y="246">+2.169%</text>
             <text class="chart-text" x="0" y="276">GRU</text>
-            <rect class="chart-good" x="137" y="266" width="43" height="7" />
+            <rect class="chart-bar chart-good bar-from-right" x="137" y="266" width="43" height="9" rx="3" />
             <text class="chart-label" x="58" y="276">-0.165%</text>
             <text class="chart-text" x="0" y="306">Transformer</text>
-            <rect class="chart-caution" x="180" y="296" width="152" height="7" />
+            <rect class="chart-bar chart-caution" x="180" y="296" width="152" height="9" rx="3" />
             <text class="chart-label" x="342" y="306">+0.585%</text>
 
             <text class="chart-label" x="0" y="371">ITMG</text>
             <text class="chart-text" x="0" y="401">XGBoost</text>
-            <rect class="chart-caution" x="180" y="391" width="241" height="7" />
+            <rect class="chart-bar chart-caution" x="180" y="391" width="241" height="9" rx="3" />
             <text class="chart-label" x="431" y="401">+0.928%</text>
             <text class="chart-text" x="0" y="431">GRU</text>
-            <rect class="chart-caution" x="180" y="421" width="81" height="7" />
+            <rect class="chart-bar chart-caution" x="180" y="421" width="81" height="9" rx="3" />
             <text class="chart-label" x="271" y="431">+0.312%</text>
             <text class="chart-text" x="0" y="461">Transformer</text>
-            <rect class="chart-caution" x="180" y="451" width="246" height="7" />
+            <rect class="chart-bar chart-caution" x="180" y="451" width="246" height="9" rx="3" />
             <text class="chart-label" x="436" y="461">+0.947%</text>
           </svg>
         </div>
+
+        <div class="mobile-model-results" aria-label="Normalized model comparison for small screens">
+          <div class="mobile-result-group">
+            <h4>ADRO · Δ RMSE vs naive</h4>
+            <div class="mobile-result-row"><strong>XGBoost</strong><span class="worse">+2.182%</span></div>
+            <div class="mobile-result-row"><strong>GRU</strong><span class="better">-0.018%</span></div>
+            <div class="mobile-result-row"><strong>Transformer</strong><span class="worse">+0.631%</span></div>
+          </div>
+          <div class="mobile-result-group">
+            <h4>PTBA · Δ RMSE vs naive</h4>
+            <div class="mobile-result-row"><strong>XGBoost</strong><span class="worse">+2.169%</span></div>
+            <div class="mobile-result-row"><strong>GRU</strong><span class="better">-0.165%</span></div>
+            <div class="mobile-result-row"><strong>Transformer</strong><span class="worse">+0.585%</span></div>
+          </div>
+          <div class="mobile-result-group">
+            <h4>ITMG · Δ RMSE vs naive</h4>
+            <div class="mobile-result-row"><strong>XGBoost</strong><span class="worse">+0.928%</span></div>
+            <div class="mobile-result-row"><strong>GRU</strong><span class="worse">+0.312%</span></div>
+            <div class="mobile-result-row"><strong>Transformer</strong><span class="worse">+0.947%</span></div>
+          </div>
+        </div>
+
         <ul class="legend" aria-label="Chart legend">
           <li class="lower">Lower RMSE</li>
           <li class="baseline">Naive baseline</li>
@@ -1594,17 +1989,17 @@
     </section>
 
     <section class="reflection" id="reflection" aria-labelledby="reflection-title">
-      <div class="section-head">
-        <p class="section-index">10 / Reflection</p>
-        <h2 id="reflection-title">What the evidence changed in my thinking</h2>
+      <div class="reflection-layout">
+        <p class="reflection-evidence"><strong>10/12</strong>The GRU had the lowest mean development-fold RMSE in 10 of 12 equity × feature-group comparisons. That looked promising. It was not enough.</p>
+        <div class="reflection-copy">
+          <h2 id="reflection-title">What the evidence changed in my thinking</h2>
+          <p class="reflection-statement">A complex model can look better during development and still offer little evidence of a repeatable advantage. <span class="caution-text">I would rather keep that negative result</span> than turn a fragile improvement into a forecasting claim.</p>
+        </div>
       </div>
-      <p class="reflection-evidence">The GRU won <strong>10 of 12</strong> feature groups on mean development-fold RMSE. That looked promising. It was not enough.</p>
-      <p class="reflection-statement">A complex model can look better during development and still offer little evidence of a repeatable advantage. <span class="caution-text">I would rather keep that negative result</span> than turn a fragile improvement into a forecasting claim.</p>
     </section>
 
     <section id="risk" aria-labelledby="risk-title">
       <div class="section-head">
-        <p class="section-index">11 / Secondary</p>
         <h2 id="risk-title">Additional analysis</h2>
       </div>
       <div class="risk-layout">
@@ -1629,7 +2024,6 @@
 
     <section id="limitations" aria-labelledby="limitations-title">
       <div class="section-head">
-        <p class="section-index">12 / Limits</p>
         <h2 id="limitations-title">Limits and the next test</h2>
       </div>
       <div class="limits">
@@ -1650,7 +2044,6 @@
         </article>
       </div>
       <div class="next-tests">
-        <h3>Next study</h3>
         <ul>
           <li>Reserve a genuinely unseen future period</li>
           <li>Model corporate-event regimes explicitly</li>
@@ -1662,8 +2055,7 @@
 
     <section id="references" aria-labelledby="references-title">
       <div class="section-head">
-        <p class="section-index">13 / Sources</p>
-        <h2 id="references-title">Research trail</h2>
+        <h2 id="references-title">Research reference</h2>
       </div>
       <p class="reference-intro">These sources explain why a variable, comparison, or model entered the experiment. They do not validate this study's result.</p>
       <ol class="references">
@@ -1679,19 +2071,196 @@
         <li id="ref-10">K. Cho et al., <cite>"Learning Phrase Representations Using RNN Encoder-Decoder for Statistical Machine Translation,"</cite> Proc. EMNLP, pp. 1724-1734, 2014. <a href="https://doi.org/10.3115/v1/D14-1179">doi:10.3115/v1/D14-1179</a>.</li>
         <li id="ref-11">A. Vaswani et al., <cite>"Attention Is All You Need,"</cite> Advances in Neural Information Processing Systems 30, 2017. <a href="https://proceedings.neurips.cc/paper/7181-attention-is-all-you-need">proceedings.neurips.cc</a>.</li>
         <li id="ref-12">A. Zeng, M. Chen, L. Zhang, and Q. Xu, <cite>"Are Transformers Effective for Time Series Forecasting?"</cite> Proc. AAAI, vol. 37, pp. 11121-11128, 2023. <a href="https://doi.org/10.1609/aaai.v37i9.26317">doi:10.1609/aaai.v37i9.26317</a>.</li>
+        <li id="ref-13">Kementerian Energi dan Sumber Daya Mineral Republik Indonesia, <cite>"Capaian Positif Tahun 2025, Negara Hadir Penuhi Kebutuhan Energi Masyarakat,"</cite> Press Release No. 002.Pers/04/SJI/2026, Jan. 9, 2026. <a href="https://www.esdm.go.id/id/media-center/arsip-berita/capaian-positif-tahun-2025-negara-hadir-penuhi-kebutuhan-energi-masyarakat">esdm.go.id</a>.</li>
       </ol>
     </section>
 
     <section class="repository" id="repository" aria-labelledby="repository-title">
-      <p class="section-index">14 / Inspect</p>
       <h2 id="repository-title">Repository</h2>
-      <p class="repository-copy">The repository includes the experiment pipeline, cached-data provenance, temporal-validation checks, leakage tests, committed evidence, and CI.</p>
-      <a class="repo-link" href="https://github.com/wahyuabrory/indonesian-coal-forecasting-research">View GitHub Repository <span aria-hidden="true">↗</span></a>
+      <p class="repository-copy">The repository includes temporal splits, leakage checks, deterministic experiments, and CI tests.</p>
+      <a class="repo-link" href="https://github.com/wahyuabrory/indonesian-coal-forecasting-research" aria-label="View Indonesian Coal Forecasting Research on GitHub">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 .7a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2.23c-3.22.7-3.9-1.37-3.9-1.37-.52-1.34-1.28-1.7-1.28-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.57-.29-5.27-1.29-5.27-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.16 1.18A10.98 10.98 0 0 1 12 6.07c.98 0 1.96.13 2.88.39 2.19-1.49 3.16-1.18 3.16-1.18.63 1.59.23 2.77.11 3.06.74.81 1.19 1.84 1.19 3.1 0 4.42-2.71 5.4-5.29 5.69.42.36.79 1.07.79 2.15v3.27c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .7Z"/></svg>
+        <span>View GitHub Repository</span>
+      </a>
     </section>
   </main>
 
   <footer>
     <p>Case study values are taken from the repository's committed research evidence.</p>
   </footer>
+
+  <script>
+    (() => {
+      const tracers = [...document.querySelectorAll('.signal-tracer[data-wave]')];
+      const tracerAnimations = tracers.map((tracer) => {
+        const wave = document.getElementById(tracer.dataset.wave);
+        const stopX = Number(tracer.dataset.stopX);
+        const stopY = Number(tracer.dataset.stopY);
+        const totalLength = wave.getTotalLength();
+        let stopLength = 0;
+        let closestDistance = Number.POSITIVE_INFINITY;
+
+        for (let index = 0; index <= 600; index += 1) {
+          const length = totalLength * index / 600;
+          const point = wave.getPointAtLength(length);
+          const distance = Math.hypot(point.x - stopX, point.y - stopY);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            stopLength = length;
+          }
+        }
+
+        const keyframes = Array.from({ length: 121 }, (_, index) => {
+          const progress = index / 120;
+          const point = wave.getPointAtLength(stopLength * progress);
+          return {
+            offset: progress,
+            transform: `translate(${point.x - stopX}px, ${point.y - stopY}px)`
+          };
+        });
+        keyframes[keyframes.length - 1].transform = 'translate(0, 0)';
+        tracer.style.transform = keyframes[0].transform;
+        return { tracer, keyframes };
+      });
+
+      requestAnimationFrame(() => {
+        tracerAnimations.forEach(({ tracer, keyframes }, index) => {
+          tracer.animate(keyframes, {
+            duration: 2800,
+            delay: index * 110,
+            easing: 'cubic-bezier(.65, 0, .35, 1)',
+            fill: 'both'
+          });
+        });
+      });
+
+      let scrollAnimationFrame = 0;
+      const stopScrollAnimation = () => {
+        if (!scrollAnimationFrame) return;
+        cancelAnimationFrame(scrollAnimationFrame);
+        scrollAnimationFrame = 0;
+      };
+
+      const animateScrollTo = (targetY) => {
+        stopScrollAnimation();
+        const startY = window.scrollY;
+        const distance = targetY - startY;
+        const duration = 1000;
+        const startedAt = performance.now();
+
+        const step = (now) => {
+          const progress = Math.min((now - startedAt) / duration, 1);
+          const eased = progress < .5
+            ? 4 * progress * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+          window.scrollTo(0, startY + distance * eased);
+
+          if (progress < 1) {
+            scrollAnimationFrame = requestAnimationFrame(step);
+          } else {
+            scrollAnimationFrame = 0;
+          }
+        };
+
+        scrollAnimationFrame = requestAnimationFrame(step);
+      };
+
+      window.addEventListener('wheel', stopScrollAnimation, { passive: true });
+      window.addEventListener('touchstart', stopScrollAnimation, { passive: true });
+
+      document.querySelectorAll('.nav-links a[href^="#"]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          const target = document.querySelector(link.hash);
+          if (!target) return;
+          event.preventDefault();
+          const targetY = target.getBoundingClientRect().top + window.scrollY - 28;
+          history.pushState(null, '', link.hash);
+          animateScrollTo(targetY);
+        });
+      });
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (reduceMotion.matches || !('IntersectionObserver' in window)) return;
+
+      const targets = document.querySelectorAll([
+        '.section-head',
+        '.split > *',
+        '.question-stage',
+        '.shift-arrow',
+        '.questions li',
+        '.dataset-strip > div',
+        '.eda-grid figure',
+        '.eda-note',
+        '.controls > div',
+        '.timeline-figure',
+        '.model-list li',
+        '.feature-list > div',
+        '.feature-rationale > p',
+        '.feature-note',
+        '.results-intro',
+        '.result-figure',
+        '.feature-result > *',
+        '.table-wrap',
+        '.mobile-result-group',
+        '.reflection-evidence',
+        '.reflection-copy',
+        '.risk-layout > *',
+        '.risk-values > div',
+        '.limit-item',
+        '.next-tests li',
+        '.reference-intro',
+        '.references li',
+        '.repository-copy',
+        '.repo-link'
+      ].join(','));
+      const charts = document.querySelectorAll('figure svg');
+      const staggerGroups = document.querySelectorAll([
+        '.questions',
+        '.dataset-strip',
+        '.eda-grid',
+        '.controls',
+        '.model-list',
+        '.feature-list',
+        '.feature-rationale',
+        '.risk-values',
+        '.limits',
+        '.next-tests ul',
+        '.references',
+        '.mobile-model-results'
+      ].join(','));
+
+      targets.forEach((target) => target.setAttribute('data-reveal', ''));
+      staggerGroups.forEach((group) => {
+        [...group.children].forEach((child, index) => {
+          child.style.setProperty('--reveal-delay', `${Math.min(index * 45, 180)}ms`);
+        });
+      });
+      charts.forEach((chart) => {
+        chart.setAttribute('data-chart-animate', '');
+        const bars = [...chart.querySelectorAll('.chart-bar, .timeline-bar')];
+        const lines = [...chart.querySelectorAll('line.chart-neutral, path.chart-neutral')];
+        const points = [...chart.querySelectorAll('circle')];
+
+        lines.forEach((mark) => mark.classList.add('chart-line-motion'));
+        points.forEach((mark) => mark.classList.add('chart-point-motion'));
+
+        [...bars, ...lines, ...points].forEach((mark, index) => {
+          mark.style.setProperty('--chart-delay', `${80 + Math.min(index * 45, 420)}ms`);
+        });
+      });
+      document.documentElement.classList.add('motion-ready');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.setAttribute('data-visible', 'true');
+          observer.unobserve(entry.target);
+        });
+      }, { rootMargin: '0px 0px -100px', threshold: 0.08 });
+
+      targets.forEach((target) => observer.observe(target));
+      charts.forEach((chart) => observer.observe(chart));
+    })();
+  </script>
 </body>
 </html>
