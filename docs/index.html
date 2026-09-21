@@ -1,0 +1,1697 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="A leak-aware forecasting study of next-day returns for three Indonesian coal equities, with a negative result kept intact.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; script-src 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'none'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap">
+  <title>Indonesian Coal Forecasting Research</title>
+  <style>
+    :root {
+      --bg: #000;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --quiet: #71717a;
+      --axis: #3f3f46;
+      --axis-soft: #27272a;
+      --good: #63d89b;
+      --good-dark: #277451;
+      --caution: #f0b85a;
+      --caution-dark: #8d5b18;
+      --paper: #fafafa;
+      --ink: #09090b;
+      --ease-out: cubic-bezier(.23, 1, .32, 1);
+      --page: min(1180px, calc(100% - 48px));
+      --measure: 68ch;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { background: var(--bg); }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.7;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    a { color: inherit; }
+
+    a:focus-visible,
+    summary:focus-visible,
+    [tabindex="0"]:focus-visible {
+      outline: 2px solid var(--paper);
+      outline-offset: 5px;
+      border-radius: 2px;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 20;
+      top: 12px;
+      left: 12px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: .8rem;
+      font-weight: 800;
+      transform: translateY(-180%);
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    .site-header {
+      width: var(--page);
+      margin: 0 auto;
+      padding: 24px 0 0;
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .site-mark {
+      color: var(--text);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-decoration: none;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .site-mark::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 9px;
+      background: var(--caution);
+      vertical-align: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 22px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 700;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 5px;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    section {
+      width: var(--page);
+      margin: 0 auto;
+      padding: 132px 0 24px;
+      scroll-margin-top: 28px;
+    }
+
+    .hero {
+      min-height: min(900px, 92vh);
+      display: grid;
+      align-content: center;
+      padding-top: 112px;
+    }
+
+    .hero-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr);
+      gap: clamp(48px, 8vw, 120px);
+      align-items: end;
+    }
+
+    .kicker,
+    .section-index,
+    .chart-kicker,
+    .micro-label {
+      margin: 0;
+      color: var(--quiet);
+      font-size: .7rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      max-width: 13ch;
+      margin: 22px 0 28px;
+      font-size: clamp(3rem, 7vw, 6.7rem);
+      font-weight: 700;
+      letter-spacing: -.07em;
+      line-height: .94;
+    }
+
+    .hero-question {
+      max-width: 52ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      line-height: 1.55;
+    }
+
+    .hero-result {
+      max-width: 52ch;
+      margin: 28px 0 0;
+      color: var(--text);
+      font-size: clamp(1.15rem, 2.15vw, 1.55rem);
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .caution-text,
+    .good-text {
+      color: var(--caution);
+      background: linear-gradient(to bottom, #ffd78e, var(--caution));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .good-text {
+      color: var(--good);
+      background-image: linear-gradient(to bottom, #9aefbd, var(--good));
+    }
+
+    .metadata {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px 0;
+      margin: 40px 0 0;
+      padding: 0;
+      color: var(--quiet);
+      list-style: none;
+      font-size: .71rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .metadata li:not(:last-child)::after {
+      content: "/";
+      margin: 0 11px;
+      color: var(--axis);
+    }
+
+    .verdict {
+      align-self: end;
+      padding-bottom: 8px;
+    }
+
+    .verdict-number {
+      display: block;
+      margin: 12px 0 4px;
+      color: var(--caution);
+      font-size: clamp(4.5rem, 10vw, 8.5rem);
+      font-weight: 700;
+      letter-spacing: -.08em;
+      line-height: .9;
+    }
+
+    .verdict-label {
+      max-width: 28ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .verdict-note {
+      margin: 20px 0 0;
+      color: var(--quiet);
+      font-size: .74rem;
+      line-height: 1.55;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 100px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-bottom: 56px;
+    }
+
+    .section-index { padding-top: 11px; }
+
+    h2 {
+      max-width: 18ch;
+      margin: 0;
+      font-size: clamp(2rem, 4.5vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -.055em;
+      line-height: 1.04;
+    }
+
+    h3 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -.015em;
+      line-height: 1.35;
+    }
+
+    p { margin: 0; }
+
+    .lede {
+      max-width: 64ch;
+      color: var(--muted);
+      font-size: clamp(1.02rem, 1.8vw, 1.2rem);
+      line-height: 1.75;
+    }
+
+    .body-copy {
+      max-width: var(--measure);
+      color: var(--muted);
+    }
+
+    .body-copy + .body-copy { margin-top: 18px; }
+
+    .citation {
+      color: var(--text);
+      font-size: .8em;
+      font-weight: 700;
+      text-decoration: none;
+      vertical-align: .1em;
+    }
+
+    .citation:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+      gap: clamp(48px, 8vw, 112px);
+      align-items: start;
+    }
+
+    .context-stat {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 36px;
+      margin-top: 10px;
+    }
+
+    .context-stat dt {
+      color: var(--quiet);
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    .context-stat dd {
+      margin: 9px 0 0;
+      color: var(--text);
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -.035em;
+      line-height: 1.2;
+    }
+
+    .question-shift {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 70px minmax(0, 1fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 56px;
+    }
+
+    .question-stage { min-width: 0; }
+
+    .question-stage .micro-label { margin-bottom: 13px; }
+
+    .question-stage p:last-child {
+      max-width: 34ch;
+      font-size: clamp(1.15rem, 2.15vw, 1.55rem);
+      font-weight: 700;
+      letter-spacing: -.025em;
+      line-height: 1.45;
+    }
+
+    .shift-arrow {
+      color: var(--caution);
+      font-size: 2.5rem;
+      text-align: center;
+    }
+
+    .questions {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 34px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: question;
+    }
+
+    .questions li {
+      counter-increment: question;
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.65;
+    }
+
+    .questions li::before {
+      content: "0" counter(question);
+      display: block;
+      margin-bottom: 16px;
+      color: var(--quiet);
+      font-size: .66rem;
+      font-weight: 800;
+      letter-spacing: .13em;
+    }
+
+    .dataset-strip {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr 1.35fr;
+      gap: 30px;
+      margin: 0 0 72px;
+    }
+
+    .dataset-strip div { min-width: 0; }
+
+    .dataset-strip dt {
+      color: var(--quiet);
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .dataset-strip dd {
+      margin: 8px 0 0;
+      color: var(--text);
+      font-size: .94rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .eda-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(50px, 7vw, 90px);
+    }
+
+    figure { margin: 0; }
+
+    .figure-head {
+      margin-bottom: 24px;
+    }
+
+    .figure-head h3 {
+      margin-top: 9px;
+      font-size: 1.15rem;
+    }
+
+    .figure-head p:last-child {
+      max-width: 54ch;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+      font-family: inherit;
+    }
+
+    .chart-axis { stroke: var(--axis); stroke-width: 1; }
+    .chart-guide { stroke: var(--axis-soft); stroke-width: 1; stroke-dasharray: 3 6; }
+    .chart-neutral { stroke: var(--muted); fill: none; }
+    .chart-muted-fill { fill: var(--axis); }
+    .chart-good { stroke: var(--good); fill: var(--good); }
+    .chart-caution { stroke: var(--caution); fill: var(--caution); }
+    .chart-text { fill: var(--muted); font-size: 12px; font-weight: 600; }
+    .chart-label { fill: var(--text); font-size: 12px; font-weight: 700; }
+    .chart-small { fill: var(--quiet); font-size: 10px; font-weight: 700; }
+
+    figcaption {
+      max-width: 68ch;
+      margin-top: 19px;
+      color: var(--quiet);
+      font-size: .75rem;
+      line-height: 1.65;
+    }
+
+    .eda-note {
+      max-width: 82ch;
+      margin-top: 46px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 34px 70px;
+      margin: 0 0 74px 124px;
+    }
+
+    .controls dt {
+      color: var(--text);
+      font-size: .94rem;
+      font-weight: 700;
+    }
+
+    .controls dd {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.65;
+    }
+
+    .timeline-wrap,
+    .result-chart-wrap,
+    .flip-chart-wrap,
+    .table-wrap {
+      overflow-x: auto;
+      scrollbar-color: var(--axis) var(--bg);
+      scrollbar-width: thin;
+    }
+
+    .timeline-wrap svg { min-width: 760px; }
+    .result-chart-wrap svg { min-width: 720px; }
+    .flip-chart-wrap svg { min-width: 620px; }
+
+    .timeline-figure { margin-left: 124px; }
+
+    .model-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 42px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: model;
+    }
+
+    .model-list li {
+      position: relative;
+      counter-increment: model;
+      min-width: 0;
+    }
+
+    .model-list li:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 4px;
+      right: -28px;
+      color: var(--axis);
+      font-size: 1.2rem;
+    }
+
+    .model-name {
+      display: block;
+      margin-bottom: 13px;
+      color: var(--text);
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .model-name::before {
+      content: "0" counter(model) "  ";
+      color: var(--quiet);
+      font-size: .65rem;
+      letter-spacing: .12em;
+      vertical-align: .2em;
+    }
+
+    .model-list p {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.65;
+    }
+
+    .ladder-question {
+      max-width: 37ch;
+      margin: 66px 0 0 25%;
+      font-size: clamp(1.55rem, 3vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -.045em;
+      line-height: 1.25;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 36px;
+      margin: 0;
+    }
+
+    .feature-list div { min-width: 0; }
+
+    .feature-list dt {
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -.04em;
+    }
+
+    .feature-list dd {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.65;
+    }
+
+    .feature-list dd span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .feature-rationale {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      margin: 68px 0 0 25%;
+    }
+
+    .feature-rationale p {
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
+    .feature-rule {
+      max-width: 49ch;
+      margin: 50px 0 0 25%;
+      color: var(--text);
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .results-intro {
+      max-width: 47ch;
+      margin: 0 0 74px 124px;
+      font-size: clamp(1.4rem, 3vw, 2.55rem);
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1.35;
+    }
+
+    .result-figure { margin-left: 124px; }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin: 18px 0 0;
+      padding: 0;
+      color: var(--muted);
+      list-style: none;
+      font-size: .74rem;
+    }
+
+    .legend li::before {
+      display: inline-block;
+      margin-right: 7px;
+      font-weight: 800;
+    }
+
+    .legend .lower::before { content: "←"; color: var(--good); }
+    .legend .higher::before { content: "→"; color: var(--caution); }
+    .legend .baseline::before { content: "│"; color: var(--text); }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 13px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      text-align: left;
+    }
+
+    caption {
+      padding: 0 0 13px;
+      color: var(--quiet);
+      font-size: .72rem;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    th {
+      padding: 0 20px 0 0;
+      color: var(--quiet);
+      font-size: .65rem;
+      font-weight: 800;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0 20px 0 0;
+      font-size: .78rem;
+      white-space: nowrap;
+    }
+
+    td:first-child {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .metric-table { min-width: 690px; margin-top: 38px; }
+
+    .delta-negative { color: var(--good); font-weight: 700; }
+    .delta-positive { color: var(--caution); font-weight: 700; }
+
+    .feature-result {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+      gap: clamp(52px, 7vw, 96px);
+      margin: 110px 0 0 124px;
+      align-items: start;
+    }
+
+    .feature-result-copy .lede { color: var(--text); }
+
+    .feature-result-copy p + p {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
+    .consistency-table {
+      min-width: 560px;
+      margin-top: 38px;
+    }
+
+    .consistency-table td { text-align: center; }
+    .consistency-table td:first-child { text-align: left; }
+    .consistency-table th:not(:first-child) { text-align: center; }
+
+    details {
+      margin-top: 30px;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    summary {
+      width: fit-content;
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    details p {
+      max-width: 70ch;
+      margin-top: 12px;
+    }
+
+    .reflection {
+      max-width: 1030px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+
+    .reflection .section-head {
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+
+    .reflection .section-index { padding: 0; }
+    .reflection h2 { max-width: 17ch; }
+
+    .reflection-evidence {
+      margin: 0 auto 44px;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .reflection-evidence strong {
+      color: var(--text);
+      font-size: 1.3em;
+    }
+
+    .reflection-statement {
+      margin: 0 auto;
+      max-width: 28ch;
+      font-size: clamp(2rem, 5.5vw, 5.1rem);
+      font-weight: 700;
+      letter-spacing: -.06em;
+      line-height: 1.1;
+    }
+
+    .risk-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+      gap: clamp(52px, 8vw, 120px);
+      align-items: start;
+    }
+
+    .risk-values {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 28px;
+      margin: 3px 0 0;
+    }
+
+    .risk-values dt {
+      color: var(--text);
+      font-size: .84rem;
+      font-weight: 700;
+    }
+
+    .risk-values dd {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: .74rem;
+      line-height: 1.6;
+    }
+
+    .risk-values .risk-number {
+      display: block;
+      color: var(--text);
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .limits {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(42px, 6vw, 80px);
+    }
+
+    .limit-item .micro-label {
+      margin-bottom: 15px;
+      color: var(--caution);
+    }
+
+    .limit-item p {
+      color: var(--muted);
+      font-size: .86rem;
+    }
+
+    .next-tests {
+      display: grid;
+      grid-template-columns: 100px minmax(0, 1fr);
+      gap: 24px;
+      margin-top: 72px;
+    }
+
+    .next-tests h3 {
+      color: var(--quiet);
+      font-size: .69rem;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .next-tests ul {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px 56px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .next-tests li {
+      color: var(--text);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .next-tests li::before {
+      content: "→";
+      margin-right: 10px;
+      color: var(--muted);
+    }
+
+    .reference-intro {
+      max-width: 66ch;
+      margin: 0 0 46px 124px;
+      color: var(--muted);
+    }
+
+    .references {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px 70px;
+      margin: 0 0 0 124px;
+      padding: 0;
+      list-style: none;
+      counter-reset: ref;
+    }
+
+    .references li {
+      position: relative;
+      counter-increment: ref;
+      padding-left: 42px;
+      color: var(--muted);
+      font-size: .73rem;
+      line-height: 1.65;
+    }
+
+    .references li::before {
+      content: "[" counter(ref) "]";
+      position: absolute;
+      left: 0;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .references cite { color: var(--text); font-style: normal; }
+
+    .references a {
+      color: var(--muted);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      overflow-wrap: anywhere;
+    }
+
+    .repository {
+      min-height: 74vh;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      text-align: center;
+      padding-bottom: 110px;
+    }
+
+    .repository .section-index { margin-bottom: 24px; }
+    .repository h2 { max-width: 15ch; }
+
+    .repository-copy {
+      max-width: 57ch;
+      margin: 28px auto 0;
+      color: var(--muted);
+    }
+
+    .repo-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      margin-top: 38px;
+      padding: 11px 17px;
+      border-radius: 6px;
+      background: linear-gradient(to bottom, #fff, #dadadd);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), 0 2px 0 #8f8f94;
+      color: var(--ink);
+      font-size: .82rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform 140ms var(--ease-out), box-shadow 140ms var(--ease-out);
+    }
+
+    .repo-link:active {
+      transform: scale(.97);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .75), 0 1px 0 #8f8f94;
+    }
+
+    .repo-link span {
+      margin-left: 18px;
+      font-size: 1rem;
+    }
+
+    footer {
+      width: var(--page);
+      margin: 0 auto;
+      padding: 0 0 30px;
+      color: var(--quiet);
+      font-size: .68rem;
+      text-align: center;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .repo-link:hover { transform: translateY(-2px); }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      html { scroll-behavior: smooth; }
+    }
+
+    @media (max-width: 900px) {
+      :root { --page: min(100% - 36px, 760px); }
+
+      section { padding-top: 105px; }
+
+      .hero {
+        min-height: auto;
+        padding-top: 130px;
+      }
+
+      .hero-layout,
+      .split,
+      .risk-layout,
+      .feature-result {
+        grid-template-columns: 1fr;
+      }
+
+      .verdict { margin-top: 32px; }
+
+      .section-head { grid-template-columns: 74px minmax(0, 1fr); }
+
+      .questions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 38px 44px;
+      }
+
+      .dataset-strip { grid-template-columns: 1fr 1fr; }
+      .dataset-strip div:last-child { grid-column: 1 / -1; }
+
+      .controls,
+      .timeline-figure,
+      .results-intro,
+      .result-figure,
+      .feature-result,
+      .reference-intro,
+      .references {
+        margin-left: 0;
+      }
+
+      .feature-result { margin-top: 90px; }
+
+      .model-list,
+      .feature-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .model-list li:nth-child(2)::after { display: none; }
+
+      .feature-rationale,
+      .feature-rule,
+      .ladder-question { margin-left: 0; }
+
+      .references { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      :root { --page: calc(100% - 28px); }
+
+      body { font-size: 14px; }
+
+      .site-header { padding-top: 18px; }
+      .nav-links li:nth-child(2) { display: none; }
+      .nav-links { gap: 15px; }
+
+      .hero h1 { letter-spacing: -.06em; }
+      .hero-result { font-size: 1.05rem; }
+
+      .section-head {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 42px;
+      }
+
+      .section-index { padding: 0; }
+
+      .context-stat,
+      .eda-grid,
+      .controls,
+      .feature-rationale,
+      .limits,
+      .next-tests ul {
+        grid-template-columns: 1fr;
+      }
+
+      .question-shift {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .shift-arrow {
+        transform: rotate(90deg);
+        text-align: left;
+      }
+
+      .questions { grid-template-columns: 1fr; }
+
+      .dataset-strip { grid-template-columns: 1fr; gap: 25px; }
+      .dataset-strip div:last-child { grid-column: auto; }
+
+      .model-list,
+      .feature-list { grid-template-columns: 1fr; }
+      .model-list li::after { display: none; }
+
+      .model-list li:not(:last-child) { padding-bottom: 20px; }
+
+      .feature-rationale { gap: 24px; }
+
+      .results-intro { margin-bottom: 52px; }
+      .feature-result { margin-top: 78px; }
+
+      .risk-values { grid-template-columns: 1fr; }
+
+      .next-tests {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .references li { padding-left: 36px; }
+      .repository { min-height: 68vh; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .repo-link:hover,
+      .repo-link:active { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to case study</a>
+
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Case study navigation">
+      <a class="site-mark" href="#overview">ICFR / 2026</a>
+      <ul class="nav-links">
+        <li><a href="#data">Data</a></li>
+        <li><a href="#experiment-design">Experiment</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#repository">Repository</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" id="overview" aria-labelledby="hero-title">
+      <div class="hero-layout">
+        <div>
+          <p class="kicker">01 / Outcome · Independent forecasting study</p>
+          <h1 id="hero-title">Indonesian Coal Forecasting Research</h1>
+          <p class="hero-question">Do external market signals and more complex models improve next-day return forecasts for Indonesian coal equities?</p>
+          <p class="hero-result">Across ADRO, PTBA, and ITMG, <span class="caution-text">neither added external variables nor higher model complexity produced a consistent out-of-sample advantage</span> over a zero-return baseline.</p>
+          <ul class="metadata" aria-label="Project metadata">
+            <li>Independent research</li>
+            <li>Time-series forecasting</li>
+            <li>Indonesia</li>
+            <li>Python / PyTorch / XGBoost</li>
+          </ul>
+        </div>
+        <aside class="verdict" aria-label="Main result summary">
+          <p class="micro-label">Repeatable E0 wins</p>
+          <strong class="verdict-number">0/3</strong>
+          <p class="verdict-label">complex model families beat the naive baseline across all three equities.</p>
+          <p class="verdict-note">Frozen evaluation period<br>[2023-01-01, 2026-05-01)</p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="motivation" aria-labelledby="motivation-title">
+      <div class="section-head">
+        <p class="section-index">02 / Why</p>
+        <h2 id="motivation-title">Why I investigated this</h2>
+      </div>
+      <div class="split">
+        <dl class="context-stat" aria-label="Study context">
+          <div>
+            <dt>Equities</dt>
+            <dd>3 IDX coal stocks</dd>
+          </div>
+          <div>
+            <dt>External signal</dt>
+            <dd>USD/IDR</dd>
+          </div>
+        </dl>
+        <div>
+          <p class="body-copy">I started with a broader curiosity about Indonesian financial markets. Coal gave me a constrained test case. Several large listed companies share a sector, while market conditions outside their own price histories can affect them.</p>
+          <p class="body-copy">That made a practical question possible. If these companies share external pressures, should movements in USD/IDR or peer coal equities help forecast their next trading-day returns?</p>
+          <p class="body-copy">Prior Indonesian studies made exchange-rate exposure reasonable to test <a class="citation" href="#ref-1" aria-label="Reference 1">[1]</a> <a class="citation" href="#ref-2" aria-label="Reference 2">[2]</a>. They did not prove that the variables would improve prediction.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="question-shift" aria-labelledby="shift-title">
+      <div class="section-head">
+        <p class="section-index">03 / Shift</p>
+        <h2 id="shift-title">The question became harder</h2>
+      </div>
+      <p class="lede">My first version was narrower: one stock, a GRU, and USD/IDR as an external signal. When that signal did not clearly help, the assumption behind the model became more interesting than tuning the model.</p>
+      <div class="question-shift" aria-label="Research question changed from a narrow model exercise to a controlled comparison">
+        <div class="question-stage">
+          <p class="micro-label">First question</p>
+          <p>Can I forecast ADRO with a GRU?</p>
+        </div>
+        <div class="shift-arrow" aria-hidden="true">→</div>
+        <div class="question-stage">
+          <p class="micro-label">Harder question</p>
+          <p>Can extra information or complexity survive a stricter experiment?</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="research-questions" aria-labelledby="questions-title">
+      <div class="section-head">
+        <p class="section-index">04 / Questions</p>
+        <h2 id="questions-title">Questions worth testing</h2>
+      </div>
+      <ol class="questions">
+        <li>Does USD/IDR add information beyond a stock's own history?</li>
+        <li>Do peer Indonesian coal equities add useful signal?</li>
+        <li>Does combining foreign-exchange and peer information help?</li>
+        <li>Do sequential deep-learning models outperform simpler baselines?</li>
+        <li>Does a Transformer improve enough over a GRU to justify its extra complexity?</li>
+      </ol>
+    </section>
+
+    <section id="data" aria-labelledby="data-title">
+      <div class="section-head">
+        <p class="section-index">05 / Data</p>
+        <h2 id="data-title">What the data looked like</h2>
+      </div>
+
+      <dl class="dataset-strip" aria-label="Dataset summary">
+        <div>
+          <dt>Series</dt>
+          <dd>ADRO.JK · PTBA.JK · ITMG.JK · USD/IDR</dd>
+        </div>
+        <div>
+          <dt>Coverage</dt>
+          <dd>Daily data · 2016 to 2026</dd>
+        </div>
+        <div>
+          <dt>Target</dt>
+          <dd>Next observed trading-day adjusted-close log return</dd>
+        </div>
+      </dl>
+
+      <div class="eda-grid">
+        <figure aria-labelledby="range-heading">
+          <div class="figure-head">
+            <p class="chart-kicker">Finding 01</p>
+            <h3 id="range-heading">Large moves surrounded near-zero means</h3>
+            <p>The line spans the observed minimum and maximum daily return. The white mark is the mean.</p>
+          </div>
+          <svg viewBox="0 0 700 238" role="img" aria-labelledby="range-svg-title range-svg-desc">
+            <title id="range-svg-title">Observed daily return ranges and means</title>
+            <desc id="range-svg-desc">ADRO ranges from negative 0.2829 to positive 0.1772 with mean 0.00122. PTBA ranges from negative 0.1893 to positive 0.1924 with mean 0.00094. ITMG ranges from negative 0.1052 to positive 0.1815 with mean 0.00114.</desc>
+            <line class="chart-axis" x1="80" y1="202" x2="660" y2="202" />
+            <line class="chart-guide" x1="428" y1="22" x2="428" y2="202" />
+            <text class="chart-small" x="80" y="222">-0.30</text>
+            <text class="chart-small" x="420" y="222">0</text>
+            <text class="chart-small" x="642" y="222">+0.20</text>
+
+            <text class="chart-label" x="0" y="51">ADRO</text>
+            <line class="chart-neutral" x1="100" y1="47" x2="634" y2="47" stroke-width="5" />
+            <circle class="chart-caution" cx="100" cy="47" r="5" />
+            <circle class="chart-caution" cx="634" cy="47" r="5" />
+            <circle cx="429.4" cy="47" r="6" fill="var(--text)" />
+            <text class="chart-small" x="88" y="69">-0.2829</text>
+            <text class="chart-small" x="610" y="69">+0.1772</text>
+
+            <text class="chart-label" x="0" y="111">PTBA</text>
+            <line class="chart-neutral" x1="208" y1="107" x2="651" y2="107" stroke-width="5" />
+            <circle class="chart-caution" cx="208" cy="107" r="5" />
+            <circle class="chart-caution" cx="651" cy="107" r="5" />
+            <circle cx="429.1" cy="107" r="6" fill="var(--text)" />
+            <text class="chart-small" x="194" y="129">-0.1893</text>
+            <text class="chart-small" x="625" y="129">+0.1924</text>
+
+            <text class="chart-label" x="0" y="171">ITMG</text>
+            <line class="chart-neutral" x1="306" y1="167" x2="639" y2="167" stroke-width="5" />
+            <circle class="chart-caution" cx="306" cy="167" r="5" />
+            <circle class="chart-caution" cx="639" cy="167" r="5" />
+            <circle cx="429.3" cy="167" r="6" fill="var(--text)" />
+            <text class="chart-small" x="292" y="189">-0.1052</text>
+            <text class="chart-small" x="613" y="189">+0.1815</text>
+          </svg>
+          <figcaption>Means were 0.00122, 0.00094, and 0.00114. A zero-return forecast is therefore a serious baseline, not a token comparison.</figcaption>
+        </figure>
+
+        <figure aria-labelledby="tails-heading">
+          <div class="figure-head">
+            <p class="chart-kicker">Finding 02</p>
+            <h3 id="tails-heading">The return series had heavy tails</h3>
+            <p>Excess kurtosis was well above zero for all three equities.</p>
+          </div>
+          <svg viewBox="0 0 700 238" role="img" aria-labelledby="tails-svg-title tails-svg-desc">
+            <title id="tails-svg-title">Excess kurtosis by equity</title>
+            <desc id="tails-svg-desc">ADRO excess kurtosis is 7.45, PTBA is 7.80, and ITMG is 3.69.</desc>
+            <line class="chart-axis" x1="94" y1="202" x2="650" y2="202" />
+            <line class="chart-guide" x1="372" y1="26" x2="372" y2="202" />
+            <text class="chart-small" x="89" y="222">0</text>
+            <text class="chart-small" x="364" y="222">4</text>
+            <text class="chart-small" x="642" y="222">8</text>
+
+            <text class="chart-label" x="0" y="54">ADRO</text>
+            <rect class="chart-caution" x="94" y="40" width="518" height="15" rx="2" />
+            <text class="chart-label" x="620" y="53">7.45</text>
+
+            <text class="chart-label" x="0" y="114">PTBA</text>
+            <rect class="chart-caution" x="94" y="100" width="542" height="15" rx="2" />
+            <text class="chart-label" x="644" y="113">7.80</text>
+
+            <text class="chart-label" x="0" y="174">ITMG</text>
+            <rect class="chart-caution" x="94" y="160" width="256" height="15" rx="2" />
+            <text class="chart-label" x="358" y="173">3.69</text>
+          </svg>
+          <figcaption>A Jarque-Bera test rejects normality for all three series. Rolling volatility also changes through time, so the feature set records 5-day and 20-day volatility.</figcaption>
+        </figure>
+      </div>
+
+      <p class="eda-note"><strong>Lagged relationships were weak.</strong> The EDA found no strong persistent lead-lag pattern with the external series. ADRO also shows a visible shift around the late-2024 ADRO/AADI restructuring. No formal break test was run, so the study carries this as a limitation rather than claiming a break.</p>
+    </section>
+
+    <section id="experiment-design" aria-labelledby="design-title">
+      <div class="section-head">
+        <p class="section-index">06 / Controls</p>
+        <h2 id="design-title">Designing a result I could defend</h2>
+      </div>
+
+      <dl class="controls">
+        <div>
+          <dt>Forecast returns, not raw prices</dt>
+          <dd>Raw prices are persistent. Next-day log returns remove the easy shortcut of predicting something close to today's price.</dd>
+        </div>
+        <div>
+          <dt>Use a zero-return baseline</dt>
+          <dd>Complexity must beat a forecast of no next-day movement before it earns a claim of added value.</dd>
+        </div>
+        <div>
+          <dt>Keep future information out</dt>
+          <dd>External observations receive a one-observation availability delay, then backward-only as-of alignment.</dd>
+        </div>
+        <div>
+          <dt>Fit preprocessing on past data</dt>
+          <dd>Each fold fits its scalers on the training period. Validation and evaluation rows are transform-only.</dd>
+        </div>
+        <div>
+          <dt>Preserve time order</dt>
+          <dd>Three expanding windows replace random train-test splits, following time-series evaluation guidance <a class="citation" href="#ref-6" aria-label="Reference 6">[6]</a> <a class="citation" href="#ref-7" aria-label="Reference 7">[7]</a> <a class="citation" href="#ref-8" aria-label="Reference 8">[8]</a>.</dd>
+        </div>
+        <div>
+          <dt>Freeze the later period</dt>
+          <dd>Candidate selection uses the development folds. Frozen families refit on pre-2023 data before one later evaluation.</dd>
+        </div>
+        <div>
+          <dt>Compare like with like</dt>
+          <dd>Feature groups are compared inside the same family. All families use at most the previous 20 trading days.</dd>
+        </div>
+        <div>
+          <dt>Freeze one candidate per family</dt>
+          <dd>Mean fold RMSE selects one XGBoost, GRU, and Transformer candidate. Families do not compete during selection.</dd>
+        </div>
+      </dl>
+
+      <figure class="timeline-figure" aria-labelledby="timeline-heading">
+        <div class="figure-head">
+          <p class="chart-kicker">Temporal validation</p>
+          <h3 id="timeline-heading">Each decision stops before its evidence</h3>
+        </div>
+        <div class="timeline-wrap" tabindex="0" aria-label="Scrollable expanding-window validation diagram">
+          <svg viewBox="0 0 900 320" role="img" aria-labelledby="timeline-svg-title timeline-svg-desc">
+            <title id="timeline-svg-title">Three expanding development folds and one frozen evaluation period</title>
+            <desc id="timeline-svg-desc">Fold one trains from 2016 through 2019 and validates on 2020. Fold two trains through 2020 and validates on 2021. Fold three trains through 2021 and validates on 2022. Decisions are frozen, then evaluated from 2023 through April 2026.</desc>
+            <text class="chart-small" x="157" y="30">2016</text>
+            <text class="chart-small" x="291" y="30">2018</text>
+            <text class="chart-small" x="425" y="30">2020</text>
+            <text class="chart-small" x="559" y="30">2022</text>
+            <text class="chart-small" x="693" y="30">2024</text>
+            <text class="chart-small" x="827" y="30">2026</text>
+            <line class="chart-axis" x1="160" y1="48" x2="842" y2="48" />
+
+            <text class="chart-label" x="0" y="91">Fold 1</text>
+            <rect class="chart-muted-fill" x="160" y="76" width="268" height="16" rx="2" />
+            <rect class="chart-good" x="428" y="76" width="67" height="16" rx="2" />
+            <text class="chart-small" x="171" y="70">train</text>
+            <text class="chart-small" x="434" y="70">validate 2020</text>
+
+            <text class="chart-label" x="0" y="143">Fold 2</text>
+            <rect class="chart-muted-fill" x="160" y="128" width="335" height="16" rx="2" />
+            <rect class="chart-good" x="495" y="128" width="67" height="16" rx="2" />
+            <text class="chart-small" x="501" y="122">validate 2021</text>
+
+            <text class="chart-label" x="0" y="195">Fold 3</text>
+            <rect class="chart-muted-fill" x="160" y="180" width="402" height="16" rx="2" />
+            <rect class="chart-good" x="562" y="180" width="67" height="16" rx="2" />
+            <text class="chart-small" x="568" y="174">validate 2022</text>
+
+            <text class="chart-label" x="0" y="247">Frozen</text>
+            <line class="chart-guide" x1="629" y1="54" x2="629" y2="270" />
+            <rect class="chart-caution" x="629" y="232" width="213" height="16" rx="2" />
+            <text class="chart-small" x="640" y="224">evaluate 2023 to 2026</text>
+            <text class="chart-label" x="160" y="292">select on folds</text>
+            <text class="chart-label" x="629" y="292">freeze decisions</text>
+          </svg>
+        </div>
+        <figcaption>Intervals are half-open. The frozen period is procedural, not pristine: earlier project iterations had already inspected parts of 2023 to 2026.</figcaption>
+      </figure>
+    </section>
+
+    <section id="models" aria-labelledby="models-title">
+      <div class="section-head">
+        <p class="section-index">07 / Complexity</p>
+        <h2 id="models-title">Testing complexity</h2>
+      </div>
+      <ol class="model-list">
+        <li>
+          <span class="model-name">Zero-return baseline</span>
+          <p>Sets the minimum useful performance with a forecast of 0.0.</p>
+        </li>
+        <li>
+          <span class="model-name">XGBoost</span>
+          <p>Tests bounded nonlinear relationships in engineered features <a class="citation" href="#ref-9" aria-label="Reference 9">[9]</a>.</p>
+        </li>
+        <li>
+          <span class="model-name">GRU</span>
+          <p>Tests whether short sequential structure adds value <a class="citation" href="#ref-10" aria-label="Reference 10">[10]</a>.</p>
+        </li>
+        <li>
+          <span class="model-name">Transformer</span>
+          <p>Tests extra sequence-model complexity, with counterevidence in view <a class="citation" href="#ref-11" aria-label="Reference 11">[11]</a> <a class="citation" href="#ref-12" aria-label="Reference 12">[12]</a>.</p>
+        </li>
+      </ol>
+      <p class="ladder-question">Does each extra level of complexity earn its cost with repeatable improvement?</p>
+    </section>
+
+    <section id="features" aria-labelledby="features-title">
+      <div class="section-head">
+        <p class="section-index">08 / Information</p>
+        <h2 id="features-title">Testing information</h2>
+      </div>
+      <dl class="feature-list">
+        <div>
+          <dt>E0</dt>
+          <dd><span>Own history</span>The target's return history, represented as engineered summaries or raw sequences.</dd>
+        </div>
+        <div>
+          <dt>E1</dt>
+          <dd><span>E0 + USD/IDR</span>Lagged FX information with the conservative availability rule.</dd>
+        </div>
+        <div>
+          <dt>E2</dt>
+          <dd><span>E0 + peers</span>Lagged returns from the other coal equities.</dd>
+        </div>
+        <div>
+          <dt>E3</dt>
+          <dd><span>E0 + USD/IDR + peers</span>The two external signal sets combined.</dd>
+        </div>
+      </dl>
+      <div class="feature-rationale">
+        <p>E1 follows Indonesian evidence on exchange-rate exposure <a class="citation" href="#ref-1" aria-label="Reference 1">[1]</a> <a class="citation" href="#ref-2" aria-label="Reference 2">[2]</a>.</p>
+        <p>E2 is exploratory. Industry information diffusion makes peer returns plausible, but the source evidence is monthly US data, not daily Indonesian coal data <a class="citation" href="#ref-3" aria-label="Reference 3">[3]</a> <a class="citation" href="#ref-4" aria-label="Reference 4">[4]</a> <a class="citation" href="#ref-5" aria-label="Reference 5">[5]</a>.</p>
+      </div>
+      <p class="feature-rule">I did not add indicators or external variables simply because they were available. Each group needed a reason to exist.</p>
+    </section>
+
+    <section id="results" aria-labelledby="results-title">
+      <div class="section-head">
+        <p class="section-index">09 / Evidence</p>
+        <h2 id="results-title">What survived evaluation</h2>
+      </div>
+      <p class="results-intro">Some complex models produced small improvements on individual equities. <span class="caution-text">Those gains did not repeat consistently</span> across stocks or feature groups.</p>
+
+      <figure class="result-figure" aria-labelledby="comparison-heading">
+        <div class="figure-head">
+          <p class="chart-kicker">Model comparison · E0 only</p>
+          <h3 id="comparison-heading">Difference in final RMSE versus zero return</h3>
+          <p>Negative is lower error. Positive is worse. The baseline sits at 0% for each equity.</p>
+        </div>
+        <div class="result-chart-wrap" tabindex="0" aria-label="Scrollable normalized model comparison chart">
+          <svg viewBox="0 0 920 515" role="img" aria-labelledby="comparison-svg-title comparison-svg-desc">
+            <title id="comparison-svg-title">E0 model RMSE difference from the zero-return baseline</title>
+            <desc id="comparison-svg-desc">For ADRO, XGBoost is 2.182 percent worse, GRU is 0.018 percent better, and Transformer is 0.631 percent worse. For PTBA, XGBoost is 2.169 percent worse, GRU is 0.165 percent better, and Transformer is 0.585 percent worse. For ITMG, XGBoost is 0.928 percent worse, GRU is 0.312 percent worse, and Transformer is 0.947 percent worse.</desc>
+
+            <line class="chart-guide" x1="180" y1="30" x2="180" y2="482" />
+            <line class="chart-guide" x1="440" y1="30" x2="440" y2="482" />
+            <line class="chart-guide" x1="700" y1="30" x2="700" y2="482" />
+            <text class="chart-small" x="103" y="18">-0.25%</text>
+            <text class="chart-small" x="170" y="18">0%</text>
+            <text class="chart-small" x="430" y="18">+1%</text>
+            <text class="chart-small" x="690" y="18">+2%</text>
+
+            <text class="chart-label" x="0" y="61">ADRO</text>
+            <text class="chart-text" x="0" y="91">XGBoost</text>
+            <rect class="chart-caution" x="180" y="81" width="567" height="7" />
+            <text class="chart-label" x="757" y="91">+2.182%</text>
+            <text class="chart-text" x="0" y="121">GRU</text>
+            <rect class="chart-good" x="175" y="111" width="5" height="7" />
+            <circle class="chart-good" cx="175" cy="114.5" r="5" />
+            <text class="chart-label" x="92" y="121">-0.018%</text>
+            <text class="chart-text" x="0" y="151">Transformer</text>
+            <rect class="chart-caution" x="180" y="141" width="164" height="7" />
+            <text class="chart-label" x="354" y="151">+0.631%</text>
+
+            <text class="chart-label" x="0" y="216">PTBA</text>
+            <text class="chart-text" x="0" y="246">XGBoost</text>
+            <rect class="chart-caution" x="180" y="236" width="564" height="7" />
+            <text class="chart-label" x="754" y="246">+2.169%</text>
+            <text class="chart-text" x="0" y="276">GRU</text>
+            <rect class="chart-good" x="137" y="266" width="43" height="7" />
+            <text class="chart-label" x="58" y="276">-0.165%</text>
+            <text class="chart-text" x="0" y="306">Transformer</text>
+            <rect class="chart-caution" x="180" y="296" width="152" height="7" />
+            <text class="chart-label" x="342" y="306">+0.585%</text>
+
+            <text class="chart-label" x="0" y="371">ITMG</text>
+            <text class="chart-text" x="0" y="401">XGBoost</text>
+            <rect class="chart-caution" x="180" y="391" width="241" height="7" />
+            <text class="chart-label" x="431" y="401">+0.928%</text>
+            <text class="chart-text" x="0" y="431">GRU</text>
+            <rect class="chart-caution" x="180" y="421" width="81" height="7" />
+            <text class="chart-label" x="271" y="431">+0.312%</text>
+            <text class="chart-text" x="0" y="461">Transformer</text>
+            <rect class="chart-caution" x="180" y="451" width="246" height="7" />
+            <text class="chart-label" x="436" y="461">+0.947%</text>
+          </svg>
+        </div>
+        <ul class="legend" aria-label="Chart legend">
+          <li class="lower">Lower RMSE</li>
+          <li class="baseline">Naive baseline</li>
+          <li class="higher">Higher RMSE</li>
+        </ul>
+        <figcaption>Frozen families were refit on pre-2023 development data, then scored once on the 787-row forecasting evaluation set. This is a pipeline comparison under a shared 20-day information horizon, not a pure architecture comparison.</figcaption>
+
+        <div class="table-wrap" tabindex="0" aria-label="Scrollable exact E0 RMSE table">
+          <table class="metric-table">
+            <caption>Exact final RMSE · E0 own-history features</caption>
+            <thead>
+              <tr>
+                <th scope="col">Equity</th>
+                <th scope="col">Naive</th>
+                <th scope="col">XGBoost</th>
+                <th scope="col">GRU</th>
+                <th scope="col">Transformer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ADRO</td>
+                <td>0.027035</td>
+                <td>0.027625</td>
+                <td class="delta-negative">0.027030</td>
+                <td>0.027205</td>
+              </tr>
+              <tr>
+                <td>PTBA</td>
+                <td>0.019960</td>
+                <td>0.020393</td>
+                <td class="delta-negative">0.019927</td>
+                <td>0.020077</td>
+              </tr>
+              <tr>
+                <td>ITMG</td>
+                <td class="delta-negative">0.017460</td>
+                <td>0.017622</td>
+                <td>0.017515</td>
+                <td>0.017626</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </figure>
+
+      <div class="feature-result">
+        <div class="feature-result-copy">
+          <p class="chart-kicker">Feature ablation</p>
+          <p class="lede">Development wins sometimes changed direction in the frozen period.</p>
+          <p>ADRO's GRU with peer features improved mean validation RMSE by 0.000290 versus E0. In frozen evaluation it was worse by 0.000064.</p>
+        </div>
+        <figure aria-labelledby="flip-heading">
+          <div class="figure-head">
+            <h3 id="flip-heading">ADRO · GRU · E2 versus E0</h3>
+            <p>RMSE delta. Negative is lower error.</p>
+          </div>
+          <div class="flip-chart-wrap" tabindex="0" aria-label="Scrollable development to evaluation sign-flip chart">
+            <svg viewBox="0 0 700 178" role="img" aria-labelledby="flip-svg-title flip-svg-desc">
+              <title id="flip-svg-title">ADRO GRU peer-feature RMSE delta changed direction</title>
+              <desc id="flip-svg-desc">Mean development validation delta was negative 0.000290. Frozen evaluation delta was positive 0.000064.</desc>
+              <line class="chart-axis" x1="75" y1="88" x2="650" y2="88" />
+              <line class="chart-guide" x1="513" y1="34" x2="513" y2="141" />
+              <text class="chart-small" x="64" y="112">-0.00032</text>
+              <text class="chart-small" x="501" y="112">0</text>
+              <text class="chart-small" x="618" y="112">+0.00010</text>
+              <line class="chart-neutral" x1="116" y1="67" x2="601" y2="67" stroke-width="2" />
+              <path d="M601 67l-10-6v12z" fill="var(--muted)" />
+              <circle class="chart-good" cx="116" cy="67" r="8" />
+              <circle class="chart-caution" cx="601" cy="67" r="8" />
+              <text class="chart-label" x="75" y="31">Validation</text>
+              <text class="chart-label" x="75" y="50">-0.000290</text>
+              <text class="chart-label" x="548" y="31">Evaluation</text>
+              <text class="chart-label" x="548" y="50">+0.000064</text>
+              <text class="chart-small" x="75" y="151">lower error</text>
+              <text class="chart-small" x="571" y="151">higher error</text>
+            </svg>
+          </div>
+        </figure>
+      </div>
+
+      <div class="table-wrap" tabindex="0" aria-label="Scrollable external feature consistency table">
+        <table class="consistency-table">
+          <caption>Final RMSE versus E0 inside each family · ↓ lower · ↑ higher</caption>
+          <thead>
+            <tr>
+              <th scope="col">Family / group</th>
+              <th scope="col">ADRO</th>
+              <th scope="col">PTBA</th>
+              <th scope="col">ITMG</th>
+              <th scope="col">Lower error</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>XGBoost · E1</td><td class="delta-negative">↓</td><td class="delta-negative">↓</td><td class="delta-positive">↑</td><td>2/3</td></tr>
+            <tr><td>XGBoost · E2</td><td class="delta-negative">↓</td><td class="delta-positive">↑</td><td class="delta-positive">↑</td><td>1/3</td></tr>
+            <tr><td>XGBoost · E3</td><td class="delta-negative">↓</td><td class="delta-negative">↓</td><td class="delta-positive">↑</td><td>2/3</td></tr>
+            <tr><td>GRU · E1</td><td class="delta-negative">↓</td><td class="delta-positive">↑</td><td class="delta-positive">↑</td><td>1/3</td></tr>
+            <tr><td>GRU · E2</td><td class="delta-positive">↑</td><td class="delta-positive">↑</td><td class="delta-positive">↑</td><td>0/3</td></tr>
+            <tr><td>GRU · E3</td><td class="delta-positive">↑</td><td class="delta-positive">↑</td><td class="delta-positive">↑</td><td>0/3</td></tr>
+            <tr><td>Transformer · E1</td><td class="delta-positive">↑</td><td class="delta-positive">↑</td><td class="delta-positive">↑</td><td>0/3</td></tr>
+            <tr><td>Transformer · E2</td><td class="delta-negative">↓</td><td class="delta-negative">↓</td><td class="delta-positive">↑</td><td>2/3</td></tr>
+            <tr><td>Transformer · E3</td><td class="delta-negative">↓</td><td class="delta-negative">↓</td><td class="delta-positive">↑</td><td>2/3</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="lede"><strong>No external feature group improved all three equities within any model family.</strong></p>
+      <details>
+        <summary>How to read the result</summary>
+        <p>RMSE measures error size, not economic value. The small differences do not support a trading claim, a causal claim, or a general claim about all Indonesian equities. They describe three folds and one fixed evaluation period.</p>
+      </details>
+    </section>
+
+    <section class="reflection" id="reflection" aria-labelledby="reflection-title">
+      <div class="section-head">
+        <p class="section-index">10 / Reflection</p>
+        <h2 id="reflection-title">What the evidence changed in my thinking</h2>
+      </div>
+      <p class="reflection-evidence">The GRU won <strong>10 of 12</strong> feature groups on mean development-fold RMSE. That looked promising. It was not enough.</p>
+      <p class="reflection-statement">A complex model can look better during development and still offer little evidence of a repeatable advantage. <span class="caution-text">I would rather keep that negative result</span> than turn a fragile improvement into a forecasting claim.</p>
+    </section>
+
+    <section id="risk" aria-labelledby="risk-title">
+      <div class="section-head">
+        <p class="section-index">11 / Secondary</p>
+        <h2 id="risk-title">Additional analysis</h2>
+      </div>
+      <div class="risk-layout">
+        <p class="lede">I also estimated one-day 95% historical VaR from returns before 2023, then counted breaches in the frozen period. It is a descriptive risk measure, separate from model selection and the forecasting conclusion.</p>
+        <dl class="risk-values" aria-label="One-day 95 percent historical VaR">
+          <div>
+            <dt>ADRO</dt>
+            <dd><span class="risk-number">0.042849</span>IDR 41,944.32 loss on IDR 1,000,000<br>26/788 breaches</dd>
+          </div>
+          <div>
+            <dt>PTBA</dt>
+            <dd><span class="risk-number">0.038726</span>IDR 37,986.16 loss on IDR 1,000,000<br>18/788 breaches</dd>
+          </div>
+          <div>
+            <dt>ITMG</dt>
+            <dd><span class="risk-number">0.039933</span>IDR 39,146.02 loss on IDR 1,000,000<br>20/788 breaches</dd>
+          </div>
+        </dl>
+      </div>
+      <p class="eda-note">The estimate is unconditional and uses adjusted-close log returns. It uses no forecast or residual, drives no selection, and does not guarantee future coverage.</p>
+    </section>
+
+    <section id="limitations" aria-labelledby="limitations-title">
+      <div class="section-head">
+        <p class="section-index">12 / Limits</p>
+        <h2 id="limitations-title">Limits and the next test</h2>
+      </div>
+      <div class="limits">
+        <article class="limit-item">
+          <p class="micro-label">Frozen, not untouched</p>
+          <h3>The later period is not a pristine test set</h3>
+          <p>Earlier iterations inspected parts of 2023 to 2026 before the current method was final. Treat it as honest evidence for the frozen protocol, not proof against all future peeking.</p>
+        </article>
+        <article class="limit-item">
+          <p class="micro-label">Possible regime change</p>
+          <h3>ADRO changes visibly in late 2024</h3>
+          <p>The ADRO/AADI restructuring creates a plausible structural change. The experiment does not model corporate-action interpretation or stable pre-event and post-event regimes.</p>
+        </article>
+        <article class="limit-item">
+          <p class="micro-label">Omitted by design</p>
+          <h3>Coal-price information is incomplete</h3>
+          <p>The repository has no historical release-dated HBA series with enough publication timing detail for leak-safe alignment. Backfilling a later-known monthly value would leak information.</p>
+        </article>
+      </div>
+      <div class="next-tests">
+        <h3>Next study</h3>
+        <ul>
+          <li>Reserve a genuinely unseen future period</li>
+          <li>Model corporate-event regimes explicitly</li>
+          <li>Add release-dated HBA or another coal benchmark</li>
+          <li>Expand the cross-sectional sample</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="references" aria-labelledby="references-title">
+      <div class="section-head">
+        <p class="section-index">13 / Sources</p>
+        <h2 id="references-title">Research trail</h2>
+      </div>
+      <p class="reference-intro">These sources explain why a variable, comparison, or model entered the experiment. They do not validate this study's result.</p>
+      <ol class="references">
+        <li id="ref-1">A. R. Putra and R. Robiyanto, <cite>"The Effect of Commodity Price Changes and USD/IDR Exchange Rate on Indonesian Mining Companies' Stock Return,"</cite> Jurnal Keuangan dan Perbankan, vol. 23, no. 1, pp. 97-108, 2019. <a href="https://doi.org/10.26905/jkdp.v23i1.2084">doi:10.26905/jkdp.v23i1.2084</a>.</li>
+        <li id="ref-2">A. A. Komara, B. M. Sinaga, and T. Andati, <cite>"The Impact of Changes in External and Internal Factors on Financial Performance and Stock Returns of Coal Companies,"</cite> Jurnal Aplikasi Bisnis dan Manajemen, vol. 5, no. 3, p. 513, 2019. <a href="https://doi.org/10.17358/jabm.5.3.513">doi:10.17358/jabm.5.3.513</a>.</li>
+        <li id="ref-3">T. J. Moskowitz and M. Grinblatt, <cite>"Do Industries Explain Momentum?"</cite> The Journal of Finance, vol. 54, no. 4, pp. 1249-1290, 1999. <a href="https://doi.org/10.1111/0022-1082.00146">doi:10.1111/0022-1082.00146</a>.</li>
+        <li id="ref-4">K. Hou, <cite>"Industry Information Diffusion and the Lead-Lag Effect in Stock Returns,"</cite> The Review of Financial Studies, vol. 20, no. 4, pp. 1113-1138, 2007.</li>
+        <li id="ref-5">U. Ali and D. Hirshleifer, <cite>"Shared Analyst Coverage: Unifying Momentum Spillover Effects,"</cite> Journal of Financial Economics, vol. 136, no. 3, 2020.</li>
+        <li id="ref-6">L. J. Tashman, <cite>"Out-of-Sample Tests of Forecasting Accuracy: An Analysis and Review,"</cite> International Journal of Forecasting, vol. 16, pp. 437-450, 2000. <a href="https://doi.org/10.1016/S0169-2070(00)00065-0">doi:10.1016/S0169-2070(00)00065-0</a>.</li>
+        <li id="ref-7">C. Bergmeir, R. J. Hyndman, and B. Koo, <cite>"A Note on the Validity of Cross-Validation for Evaluating Autoregressive Time Series Prediction,"</cite> Computational Statistics and Data Analysis, vol. 120, pp. 70-83, 2018. <a href="https://doi.org/10.1016/j.csda.2017.11.003">doi:10.1016/j.csda.2017.11.003</a>.</li>
+        <li id="ref-8">V. Cerqueira, L. Torgo, and I. Mozetič, <cite>"Evaluating Time Series Forecasting Models: An Empirical Study on Performance Estimation Methods,"</cite> Machine Learning, vol. 109, pp. 1997-2028, 2020. <a href="https://doi.org/10.1007/s10994-020-05910-7">doi:10.1007/s10994-020-05910-7</a>.</li>
+        <li id="ref-9">T. Chen and C. Guestrin, <cite>"XGBoost: A Scalable Tree Boosting System,"</cite> Proc. 22nd ACM SIGKDD, pp. 785-794, 2016. <a href="https://doi.org/10.1145/2939672.2939785">doi:10.1145/2939672.2939785</a>.</li>
+        <li id="ref-10">K. Cho et al., <cite>"Learning Phrase Representations Using RNN Encoder-Decoder for Statistical Machine Translation,"</cite> Proc. EMNLP, pp. 1724-1734, 2014. <a href="https://doi.org/10.3115/v1/D14-1179">doi:10.3115/v1/D14-1179</a>.</li>
+        <li id="ref-11">A. Vaswani et al., <cite>"Attention Is All You Need,"</cite> Advances in Neural Information Processing Systems 30, 2017. <a href="https://proceedings.neurips.cc/paper/7181-attention-is-all-you-need">proceedings.neurips.cc</a>.</li>
+        <li id="ref-12">A. Zeng, M. Chen, L. Zhang, and Q. Xu, <cite>"Are Transformers Effective for Time Series Forecasting?"</cite> Proc. AAAI, vol. 37, pp. 11121-11128, 2023. <a href="https://doi.org/10.1609/aaai.v37i9.26317">doi:10.1609/aaai.v37i9.26317</a>.</li>
+      </ol>
+    </section>
+
+    <section class="repository" id="repository" aria-labelledby="repository-title">
+      <p class="section-index">14 / Inspect</p>
+      <h2 id="repository-title">Repository</h2>
+      <p class="repository-copy">The repository includes the experiment pipeline, cached-data provenance, temporal-validation checks, leakage tests, committed evidence, and CI.</p>
+      <a class="repo-link" href="https://github.com/wahyuabrory/indonesian-coal-forecasting-research">View GitHub Repository <span aria-hidden="true">↗</span></a>
+    </section>
+  </main>
+
+  <footer>
+    <p>Case study values are taken from the repository's committed research evidence.</p>
+  </footer>
+</body>
+</html>
